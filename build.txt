@@ -1,0 +1,6 @@
+displayName = Unofficial HWJ Bard, Healer & Thrower
+author = Kes, Kainsett
+version = 0.1
+
+modReferences = ContinentOfJourney,ThoriumMod, ThrowerUnification 
+sortAfter = ContinentOfJourney ,ThoriumMod, ThrowerUnification 
