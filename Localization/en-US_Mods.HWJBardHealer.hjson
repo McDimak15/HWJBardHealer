@@ -1,7 +1,7 @@
 Buffs: {
 	BubbleShield: {
 		DisplayName: Bubble Shield
-		Description: Mods.HWJBardHealer.Buffs.BubbleShield.Description
+		Description: Reduces next damage by 10%
 	}
 }
 
@@ -30,3 +30,4 @@ Projectiles: {
 	CubismKunaiProj.DisplayName: Cubism Kunai Proj
 	FissionThrow_2.DisplayName: Fission Throw_2
 }
+
