@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics; 
+
 using System;                           
 using Terraria;
 using Terraria.DataStructures;
@@ -15,8 +16,6 @@ namespace HWJBardHealer.Content.Weapons.Thrower
     {
         public override void SetStaticDefaults()
         {
-            // DisplayName.SetDefault("Cubism Kunai");
-            // Tooltip.SetDefault("Inflicts Vaporfied on hit\nCreates glitchy cubes on impact");
         }
 
         public override void SetDefaults()
