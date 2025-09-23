@@ -158,7 +158,7 @@ public class GrowthSwing : ScythePro
                 if (!shouldSpin)
                 {
                     Vector2 offset = Vector2.Normalize(Main.MouseWorld - player.MountedCenter);
-                    for (int i = 0; i < 4; i++)
+                    for (int i = 0; i < 6; i++)
                         Projectile.NewProjectile(player.GetSource_ItemUse(player.HeldItem), Main.MouseWorld + offset * new Vector2(Main.screenWidth, Main.screenHeight).Length() / 2, -offset * 5, ProjectileID.Leaf, Projectile.damage / 3, Projectile.knockBack / 2, player.whoAmI);
 
                     //Vector2 shootDir = Vector2.Normalize(Main.MouseWorld - player.MountedCenter).RotatedBy((float)Math.PI / 4f * (float)Projectile.direction + (float)Main.rand.Next(-10, 11) * ((float)Math.PI / 4f) * 0.02f);
@@ -347,4 +347,5 @@ public class GrowthSwing : ScythePro
         }
         return null;
     }
+
 }
