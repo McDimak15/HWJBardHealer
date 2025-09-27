@@ -62,7 +62,7 @@ namespace HWJBardHealer.Content.Projectiles.Healer
                 return;
             }
 
-            // --- Spawn effect only once, only if target exists ---
+            // Spawn effect
             if (!didSpawnEffect)
             {
                 didSpawnEffect = true;
@@ -173,3 +173,4 @@ namespace HWJBardHealer.Content.Projectiles.Healer
         public override bool CanHitPlayer(Player target) => false;
     }
 }
+
