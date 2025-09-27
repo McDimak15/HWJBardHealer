@@ -1,5 +1,6 @@
 using Terraria;
 using Terraria.ID;
+using Terraria.DataStructures;
 using Terraria.ModLoader;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -10,19 +11,21 @@ namespace HWJBardHealer.Content.Projectiles.Healer
 {
     public class RodScytheBeam : ModProjectile
     {
+        private bool didSpawnEffect = false;
+
         public override void SetStaticDefaults()
         {
-            ProjectileID.Sets.TrailCacheLength[Projectile.type] = 15; 
-            ProjectileID.Sets.TrailingMode[Projectile.type] = 2; 
+            ProjectileID.Sets.TrailCacheLength[Projectile.type] = 15;
+            ProjectileID.Sets.TrailingMode[Projectile.type] = 2;
         }
 
         public override void SetDefaults()
         {
-            Projectile.CloneDefaults(ProjectileID.DeathLaser);
-            AIType = ProjectileID.DeathLaser;
-
+            Projectile.width = 14;
+            Projectile.height = 14;
+            Projectile.aiStyle = -1;
             Projectile.timeLeft = 120;
-            Projectile.penetrate = 1; 
+            Projectile.penetrate = 1;
             Projectile.friendly = true;
             Projectile.hostile = false;
             Projectile.tileCollide = false;
@@ -35,6 +38,7 @@ namespace HWJBardHealer.Content.Projectiles.Healer
 
         public override void AI()
         {
+            // Find closest enemy
             NPC closest = null;
             float closestDist = 800f;
             for (int i = 0; i < Main.maxNPCs; i++)
@@ -51,27 +55,49 @@ namespace HWJBardHealer.Content.Projectiles.Healer
                 }
             }
 
+            // Kill instantly if no enemy found
             if (closest == null)
             {
                 Projectile.Kill();
                 return;
             }
 
+            // --- Spawn effect only once, only if target exists ---
+            if (!didSpawnEffect)
+            {
+                didSpawnEffect = true;
+
+                 SoundEngine.PlaySound(SoundID.Item72 with { Volume = 0.8f, PitchVariance = 0.3f }, Projectile.Center);
+
+                // Burst of dust
+                for (int i = 0; i < 25; i++)
+                {
+                    Vector2 velocity = Main.rand.NextVector2Circular(3f, 3f);
+                    int dust = Dust.NewDust(Projectile.Center, 0, 0, DustID.GoldFlame, velocity.X, velocity.Y, 100, default, 1.3f);
+                    Main.dust[dust].noGravity = true;
+                }
+
+                // Sparkles
+                for (int i = 0; i < 10; i++)
+                {
+                    Vector2 velocity = Main.rand.NextVector2Circular(2f, 2f);
+                    int dust = Dust.NewDust(Projectile.Center, 0, 0, DustID.FireworkFountain_Yellow, velocity.X, velocity.Y, 150, default, 1.6f);
+                    Main.dust[dust].noGravity = true;
+                }
+            }
+
             // Homing
-            float homingSpeed = 10f;
+            float homingSpeed = 20f;
             Vector2 direction = closest.Center - Projectile.Center;
             direction.Normalize();
             direction *= homingSpeed;
 
             Projectile.velocity = (Projectile.velocity * 20f + direction) / 21f;
 
-            // spin
-            Projectile.rotation += 0.5f; 
-
-            // light
+            // Spin + light
+            Projectile.rotation += 0.5f;
             Lighting.AddLight(Projectile.Center, 0.9f, 0.8f, 0.2f);
         }
-
 
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
@@ -97,7 +123,6 @@ namespace HWJBardHealer.Content.Projectiles.Healer
 
             SoundEngine.PlaySound(SoundID.Item14 with { Volume = 1.1f, PitchVariance = 0.2f }, target.Center);
 
-            // Extra AoE
             int explosionDamage = (int)(damageDone * 0.75f);
             Projectile.NewProjectile(
                 Projectile.GetSource_FromThis(),
@@ -120,7 +145,7 @@ namespace HWJBardHealer.Content.Projectiles.Healer
             {
                 if (Projectile.oldPos[i] == Vector2.Zero) continue;
 
-                float progress = 1f - i / (float)Projectile.oldPos.Length; 
+                float progress = 1f - i / (float)Projectile.oldPos.Length;
                 Vector2 drawPos = Projectile.oldPos[i] + Projectile.Size / 2f - Main.screenPosition;
 
                 Color trailColor;
@@ -131,13 +156,11 @@ namespace HWJBardHealer.Content.Projectiles.Healer
                 else
                     trailColor = Color.Lerp(Color.White, Color.Gold, progress / 0.33f);
 
-                trailColor *= progress * 0.8f; 
+                trailColor *= progress * 0.8f;
                 Main.EntitySpriteDraw(texture, drawPos, null, trailColor, Projectile.rotation, origin, Projectile.scale, SpriteEffects.None, 0);
             }
 
-            // projectile
             Main.EntitySpriteDraw(texture, Projectile.Center - Main.screenPosition, null, Color.White, Projectile.rotation, origin, Projectile.scale, SpriteEffects.None, 0);
-
             return false;
         }
 
