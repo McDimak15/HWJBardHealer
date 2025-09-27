@@ -2,10 +2,12 @@ using System;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.ID;
+using Terraria.GameContent.ItemDropRules;
 using Microsoft.Xna.Framework;
 using ThoriumMod.Projectiles.Scythe;
 using ThoriumMod.Items.HealerItems;
 using HWJBardHealer.Content.Projectiles.Healer;
+using ContinentOfJourney.Items;
 
 namespace HWJBardHealer.Content.Weapons.Healer
 {
@@ -22,7 +24,7 @@ namespace HWJBardHealer.Content.Weapons.Healer
         {
             SetDefaultsToScythe();
 
-            Item.damage = 60;
+            Item.damage = 47;
             scytheSoulCharge = 2;
             Item.width = 64;
             Item.height = 64;
@@ -54,16 +56,25 @@ namespace HWJBardHealer.Content.Weapons.Healer
                         spawnPos,
                         beamVelocity,
                         ModContent.ProjectileType<RodScytheBeam>(),
-                        damage / 2,
+                        damage / 4,
                         knockback,
                         player.whoAmI
                     );
                 }
-
-                Terraria.Audio.SoundEngine.PlaySound(SoundID.Item33, player.Center);
             }
 
             return false;
+        }
+    }
+
+    public class RodScytheDrop : GlobalItem
+    {
+        public override void ModifyItemLoot(Item item, ItemLoot itemLoot)
+        {
+            if (item.type == ModContent.ItemType<PriestessRodTreasureBag>())
+            {
+                itemLoot.Add(ItemDropRule.Common(ModContent.ItemType<RodScythe>(), 1));
+            }
         }
     }
 }
