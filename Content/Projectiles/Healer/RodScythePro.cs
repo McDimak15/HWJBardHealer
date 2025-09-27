@@ -34,7 +34,7 @@ namespace HWJBardHealer.Content.Projectiles.Healer
             Terraria.Audio.SoundEngine.PlaySound(SoundID.Item14, target.Center);
 
             // Small explosion
-            int explosionDamage = (int)(damageDone * 0.75f);
+            int explosionDamage = (int)(damageDone * 0.9f);
             Projectile.NewProjectile(
                 Projectile.GetSource_FromThis(),
                 target.Center - new Vector2(0, 40),
@@ -44,6 +44,15 @@ namespace HWJBardHealer.Content.Projectiles.Healer
                 2f,
                 Projectile.owner
             );
+        }
+
+        // Match hitbox
+        public override void SafeModifyDamageHitbox(ref Rectangle hitbox)
+        {
+            int extraWidth = 40; 
+            int extraHeight = 0;  
+            hitbox.Inflate(extraWidth, extraHeight);
+            //hitbox.Offset(0, 20);
         }
     }
 }
