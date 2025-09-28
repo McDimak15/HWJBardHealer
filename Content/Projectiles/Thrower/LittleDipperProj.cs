@@ -105,7 +105,7 @@ namespace HWJBardHealer.Content.Projectiles.Thrower
                     target.Center + offset,
                     Vector2.Zero,
                     ModContent.ProjectileType<LittleDipperSparkle>(),
-                    damageDone / 3,
+                    damageDone / 5,
                     0f,
                     Projectile.owner,
                     target.whoAmI,
