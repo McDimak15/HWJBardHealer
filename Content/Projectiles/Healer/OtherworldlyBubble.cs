@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -25,7 +25,7 @@ namespace HWJBardHealer.Content.Projectiles.Healer
             Projectile.timeLeft = 300; 
             Projectile.ignoreWater = false;
             Projectile.alpha = 255; 
-            Projectile.scale = 1f;
+            Projectile.scale = 3.6f;
         }
 
         public override void AI()
