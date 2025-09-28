@@ -21,15 +21,16 @@ namespace HWJBardHealer.Content.Projectiles.Healer
     {
         public override void SafeSetDefaults()
         {
-
             dustOffset = new Vector2(-35, 7f);
             dustCount = 0;
             dustType = 75;
             Projectile.Size = new Vector2(140f, 150f);
+            Projectile.scale = 1.5f; 
         }
+
         public override void SafeOnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
-            target.AddBuff(ModContent.BuffType<CrushDepth> (), 180);
+            target.AddBuff(ModContent.BuffType<CrushDepth>(), 180);
 
             Player owner = Main.player[Projectile.owner];
             owner.GetModPlayer<OtherworldlyPlayer>().OnScytheHit();
@@ -37,19 +38,20 @@ namespace HWJBardHealer.Content.Projectiles.Healer
             base.SafeOnHitNPC(target, hit, damageDone);
         }
 
-        public override void PostAI()
+        public override void SafeModifyDamageHitbox(ref Rectangle hitbox)
         {
-            // Fade 
-            float fade = 1f - (Projectile.alpha / 255f);
+            int inflateX = (int)(30f);
+            int inflateY = (int)(30f);
+            hitbox.Inflate(-inflateX, -inflateY);
         }
-                                                                                        
+
         public override bool PreDraw(ref Color lightColor)
         {
             // Fade 
             lightColor *= MathHelper.Lerp(1f, 0f, Projectile.alpha / 255f);
 
             // Main scythe texture
-            Texture2D texture = (Texture2D)ModContent.Request<Texture2D>(Texture);
+            Texture2D texture = ModContent.Request<Texture2D>(Texture).Value;
             Main.EntitySpriteDraw(
                 texture,
                 Projectile.Center - Main.screenPosition,
