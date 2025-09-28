@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace WHummusMultiModBalancing.Content.ItemChanges.ThrowableScythes
+namespace HWJBardHealer.Core
 {
     [ExtendsFromMod("ThoriumMod")]
     public class ThrowableScythes : GlobalItem
@@ -36,7 +36,7 @@ namespace WHummusMultiModBalancing.Content.ItemChanges.ThrowableScythes
         {
             if (ModLoader.TryGetMod("HWJBardHealer", out Mod HWJbardhealer))
             {
-                if (item.type == HWJbardhealer.Find<ModItem>("OtherworldlyScythe").Type) ThrowDistance = 85f;
+                if (item.type == HWJbardhealer.Find<ModItem>("OtherworldlyScythe").Type) ThrowDistance = 125f;
                 if (item.type == HWJbardhealer.Find<ModItem>("RodScythe").Type) ThrowDistance = 125f;
             }
         }
