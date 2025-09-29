@@ -62,7 +62,7 @@ namespace HWJBardHealer.Content.Projectiles.Healer
                 return;
             }
 
-            // Spawn effect
+            // Spawn effect 
             if (!didSpawnEffect)
             {
                 didSpawnEffect = true;
@@ -150,11 +150,11 @@ namespace HWJBardHealer.Content.Projectiles.Healer
 
                 Color trailColor;
                 if (progress > 0.66f)
-                    trailColor = Color.Lerp(Color.White, Color.Gold, (progress - 0.66f) / 0.34f);
+                    trailColor = Color.Lerp(Color.White, Color.Gray, (progress - 0.66f) / 0.34f);
                 else if (progress > 0.33f)
-                    trailColor = Color.Lerp(Color.Gold, Color.White, (progress - 0.33f) / 0.33f);
+                    trailColor = Color.Lerp(Color.Gray, Color.White, (progress - 0.33f) / 0.33f);
                 else
-                    trailColor = Color.Lerp(Color.White, Color.Gold, progress / 0.33f);
+                    trailColor = Color.Lerp(Color.White, Color.Gray, progress / 0.33f);
 
                 trailColor *= progress * 0.8f;
                 Main.EntitySpriteDraw(texture, drawPos, null, trailColor, Projectile.rotation, origin, Projectile.scale, SpriteEffects.None, 0);
@@ -173,4 +173,3 @@ namespace HWJBardHealer.Content.Projectiles.Healer
         public override bool CanHitPlayer(Player target) => false;
     }
 }
-
