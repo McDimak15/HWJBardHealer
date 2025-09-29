@@ -12,7 +12,6 @@ namespace HWJBardHealer.Content.Projectiles.Bard
     public class EyeOfDepthsProj : BardProjectile
     {
         public override string Texture => "CalamityMod/Particles/HollowCircleHardEdge";
-
         public override BardInstrumentType InstrumentType => BardInstrumentType.Electronic;
 
         public override void SetBardDefaults()
@@ -31,7 +30,7 @@ namespace HWJBardHealer.Content.Projectiles.Bard
 
         public override void AI()
         {
-            // Fade in , fade out
+            // fade in/out
             if (Projectile.timeLeft < 15)
                 Projectile.alpha = Math.Min(255, Projectile.alpha + 20);
             else
@@ -48,43 +47,44 @@ namespace HWJBardHealer.Content.Projectiles.Bard
             Projectile.height = newSize;
             Projectile.Center = oldCenter;
 
-            // Face velocity
+            // face velocity
             if (Projectile.velocity.LengthSquared() > 0.1f)
                 Projectile.rotation = Projectile.velocity.ToRotation();
 
-            // Bubble trail
-            if (Main.rand.NextBool(2))
+            // bubble trail
+            for (int i = 0; i < 2; i++)
             {
-                int dust = Dust.NewDust(Projectile.Center, 0, 0, DustID.BubbleBurst_Blue,
-                    Main.rand.NextFloat(-1.2f, 1.2f),
-                    Main.rand.NextFloat(-1.2f, 1.2f),
+                int dust = Dust.NewDust(
+                    Projectile.Center,
+                    0, 0,
+                    DustID.BubbleBurst_Blue,
+                    Main.rand.NextFloat(-1.8f, 1.8f),
+                    Main.rand.NextFloat(-1.8f, 1.8f),
                     100,
                     default,
-                    Main.rand.NextFloat(0.8f, 1.2f));
-
+                    Main.rand.NextFloat(0.9f, 1.4f)
+                );
                 Main.dust[dust].noGravity = true;
-                Main.dust[dust].fadeIn = 1.1f;
+                Main.dust[dust].fadeIn = 1.2f;
             }
 
-            // light
-            Lighting.AddLight(Projectile.Center, 0.1f, 0.3f, 0.6f);
+            Lighting.AddLight(Projectile.Center, 0.2f, 0.4f, 0.8f);
         }
 
         public override void BardOnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
-
             Projectile.damage = Math.Max(1, Projectile.damage - 4);
 
-            // Bubble burst dust
-            for (int i = 0; i < 12; i++)
+            // bubbles
+            for (int i = 0; i < 20; i++)
             {
                 Vector2 vel = Main.rand.NextVector2Circular(3f, 3f);
-                int dust = Dust.NewDust(target.Center, 0, 0, DustID.BubbleBurst_Blue, vel.X, vel.Y, 100, default, 1.3f);
+                int dust = Dust.NewDust(target.Center, 0, 0, DustID.BubbleBurst_Blue, vel.X, vel.Y, 100, default, 1.5f);
                 Main.dust[dust].noGravity = true;
             }
 
-            // Spawn mini bubbles
-            int numProjectiles = 3;
+            // mini bubble
+            int numProjectiles = 5;
             for (int i = 0; i < numProjectiles; i++)
             {
                 Vector2 velocity = Main.rand.NextVector2CircularEdge(3f, 3f);
@@ -104,13 +104,24 @@ namespace HWJBardHealer.Content.Projectiles.Bard
         {
             Texture2D texture = ModContent.Request<Texture2D>(Texture).Value;
             Vector2 origin = texture.Size() / 2f;
-
             float fade = 1f - Projectile.alpha / 255f;
 
-            Color edgeColor = new Color(10, 20, 60, 0) * fade;    
-            Color centerColor = new Color(0, 150, 255, 0) * fade; 
+            // glow 
+            Color glowColor = new Color(100, 120, 200, 0) * fade * 0.6f;
+            Main.EntitySpriteDraw(
+                texture,
+                Projectile.Center - Main.screenPosition,
+                null,
+                glowColor,
+                Projectile.rotation,
+                origin,
+                new Vector2(28f / texture.Width, 56f / texture.Height) * Projectile.scale,
+                SpriteEffects.None,
+                0
+            );
 
             // outer ring
+            Color edgeColor = new Color(63, 66, 110, 0) * fade;
             Main.EntitySpriteDraw(
                 texture,
                 Projectile.Center - Main.screenPosition,
@@ -124,6 +135,7 @@ namespace HWJBardHealer.Content.Projectiles.Bard
             );
 
             // inner ring
+            Color centerColor = new Color(120, 130, 200, 0) * fade;
             Main.EntitySpriteDraw(
                 texture,
                 Projectile.Center - Main.screenPosition,
