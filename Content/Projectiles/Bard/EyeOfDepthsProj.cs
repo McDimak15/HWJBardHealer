@@ -12,7 +12,7 @@ namespace HWJBardHealer.Content.Projectiles.Bard
     public class EyeOfDepthsProj : BardProjectile
     {
         public override string Texture => "CalamityMod/Particles/HollowCircleHardEdge";
-        public override BardInstrumentType InstrumentType => BardInstrumentType.Electronic;
+        public override BardInstrumentType InstrumentType => BardInstrumentType.Brass;
 
         public override void SetBardDefaults()
         {
