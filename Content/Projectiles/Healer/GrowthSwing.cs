@@ -209,7 +209,7 @@ public class GrowthSwing : ScythePro
 
     public override void SafeOnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        Projectile.NewProjectile(Projectile.GetSource_OnHit(target), Main.player[Projectile.owner].Center, Main.rand.NextVector2Circular(6, 6), ModContent.ProjectileType<ForbiddenFruit>(), (int)(damageDone * 0.5f), 1, ai0: -1);
+        Projectile.NewProjectile(Projectile.GetSource_OnHit(target), Main.player[Projectile.owner].Center, Main.rand.NextVector2Circular(6, 6), ModContent.ProjectileType<ForbiddenFruit>(), (int)(damageDone * 1f), 1, ai0: -1);
 
         Color dustColor = Color.Green;
         Color dustColor2 = Color.Green;
@@ -349,3 +349,4 @@ public class GrowthSwing : ScythePro
     }
 
 }
+
