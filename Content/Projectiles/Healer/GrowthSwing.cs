@@ -16,9 +16,6 @@ namespace TestMod;
 
 public class GrowthSwing : ScythePro
 {
-    public override string Texture => "TestMod/ForbiddenGrowth";//$"Terraria/Images/Projectile_{ProjectileID.Excalibur}";
-
-
     private bool shouldSpin;
 
     public override void SafeSetStaticDefaults()
@@ -226,33 +223,6 @@ public class GrowthSwing : ScythePro
             dust.scale = Main.rand.NextFloat(0.6f, 0.9f);
         }
 
-        for (int i = 0; i < 3; i++)
-        {
-            Color impactColor = Color.Green;
-            float impactParticleScale = Main.rand.NextFloat(1f, 1.75f);
-            SparkleParticle impactParticle = new(target.Center + Main.rand.NextVector2Circular(target.width * 0.75f, target.height * 0.75f), Vector2.Zero, impactColor, Color.Green, impactParticleScale, 8, 0, 2.5f);
-            GeneralParticleHandler.SpawnParticle(impactParticle);
-        }
-
-        for (int i = 0; i < 5; i++)
-        {
-            Vector2 sparkVelocity = (target.Center - Main.player[Projectile.owner].MountedCenter).SafeNormalize(Vector2.UnitX) * 20f;
-            Vector2 sparkVelocity2 = sparkVelocity.RotatedByRandom(0.35f) * Main.rand.NextFloat(0.5f, 1.8f);
-            int sparkLifetime2 = Main.rand.Next(23, 35);
-            float sparkScale2 = Main.rand.NextFloat(0.95f, 1.8f);
-            Color sparkColor2 = Main.rand.NextBool() ? Color.Green : Color.ForestGreen;
-            if (Main.rand.NextBool())
-            {
-                AltSparkParticle spark = new AltSparkParticle(target.Center + Main.rand.NextVector2Circular(target.width * 0.5f, target.height * 0.5f) + sparkVelocity * 1.2f, sparkVelocity2, false, (int)(sparkLifetime2), sparkScale2, sparkColor2);
-                GeneralParticleHandler.SpawnParticle(spark);
-            }
-            else
-            {
-                LineParticle spark = new LineParticle(target.Center + Main.rand.NextVector2Circular(target.width * 0.5f, target.height * 0.5f) + sparkVelocity * 1.2f, sparkVelocity2, false, (int)(sparkLifetime2), sparkScale2, Main.rand.NextBool() ? Color.Green : Color.ForestGreen);
-                GeneralParticleHandler.SpawnParticle(spark);
-            }
-        }
-
         for (int i = 0; i < 25; i++)
         {
             int dustID = DustID.GreenMoss;
@@ -349,4 +319,5 @@ public class GrowthSwing : ScythePro
     }
 
 }
+
 
