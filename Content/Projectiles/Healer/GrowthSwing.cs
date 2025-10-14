@@ -155,8 +155,8 @@ public class GrowthSwing : ScythePro
                 if (!shouldSpin)
                 {
                     Vector2 offset = Vector2.Normalize(Main.MouseWorld - player.MountedCenter);
-                    for (int i = 0; i < 6; i++)
-                        Projectile.NewProjectile(player.GetSource_ItemUse(player.HeldItem), Main.MouseWorld + offset * new Vector2(Main.screenWidth, Main.screenHeight).Length() / 2, -offset * 5, ProjectileID.Leaf, Projectile.damage / 3, Projectile.knockBack / 2, player.whoAmI);
+                    for (int i = 0; i < 4; i++)
+                        Projectile.NewProjectile(player.GetSource_ItemUse(player.HeldItem, "NoTileCollide"), Main.MouseWorld + offset * new Vector2(Main.screenWidth, Main.screenHeight).Length() / 2, -offset * 5, ProjectileID.Leaf, Projectile.damage, Projectile.knockBack / 2, player.whoAmI);
 
                     //Vector2 shootDir = Vector2.Normalize(Main.MouseWorld - player.MountedCenter).RotatedBy((float)Math.PI / 4f * (float)Projectile.direction + (float)Main.rand.Next(-10, 11) * ((float)Math.PI / 4f) * 0.02f);
                     //int p = Projectile.NewProjectile(player.GetSource_ItemUse(player.HeldItem), Main.MouseWorld - shootDir * 480f, shootDir * 16f, ModContent.ProjectileType<CherubimSlash>(), Projectile.damage, Projectile.knockBack, player.whoAmI);
@@ -206,30 +206,8 @@ public class GrowthSwing : ScythePro
 
     public override void SafeOnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        Projectile.NewProjectile(Projectile.GetSource_OnHit(target), Main.player[Projectile.owner].Center, Main.rand.NextVector2Circular(6, 6), ModContent.ProjectileType<ForbiddenFruit>(), (int)(damageDone * 1f), 1, ai0: -1);
+        Projectile.NewProjectile(Projectile.GetSource_OnHit(target), Main.player[Projectile.owner].Center, Main.rand.NextVector2Circular(6, 6), ModContent.ProjectileType<ForbiddenFruit>(), damageDone, 1, ai0: -1);
 
-        Color dustColor = Color.Green;
-        Color dustColor2 = Color.Green;
-        for (int i = 0; i < 10; i++)
-        {
-            float rot = MathHelper.ToRadians(MathHelper.ToRadians(36f) * (float)i);
-            Vector2 spinningpoint = Vector2.Normalize(target.Center - Projectile.Center).RotatedBy((float)Math.PI / 4f * (float)Projectile.spriteDirection) * Projectile.velocity.Length();
-            Vector2 offset = spinningpoint.RotatedBy(rot * Main.rand.NextFloat(3.1f, 9.1f)) * new Vector2(Main.rand.NextFloat(1.5f, 5.5f));
-            Vector2 velOffset = spinningpoint.RotatedBy(rot * Main.rand.NextFloat(3.1f, 9.1f)) * new Vector2(Main.rand.NextFloat(1.5f, 5.5f));
-            GeneralParticleHandler.SpawnParticle((Particle)new MediumMistParticle(target.Center + offset, velOffset * Main.rand.NextFloat(1.5f, 3f), dustColor, dustColor2, Main.rand.NextFloat(0.9f, 1.2f), 160f, Main.rand.NextFloat(0.03f, -0.03f)));
-            Dust dust = Dust.NewDustPerfect(target.Center + offset, DustID.GreenMoss, new Vector2(velOffset.X, velOffset.Y), 0, Color.Lerp(dustColor, dustColor2, (float)Main.rand.Next(11) * 0.1f), 0.6f);
-            dust.noGravity = true;
-            dust.velocity = velOffset;
-            dust.scale = Main.rand.NextFloat(0.6f, 0.9f);
-        }
-
-        for (int i = 0; i < 25; i++)
-        {
-            int dustID = DustID.GreenMoss;
-            Dust dust2 = Dust.NewDustPerfect(target.Center + Main.rand.NextVector2Circular(target.width * 0.5f, target.height * 0.5f), dustID, ((target.Center - Main.player[Projectile.owner].MountedCenter).SafeNormalize(Vector2.UnitX) * 20f).RotatedByRandom(0.55f) * Main.rand.NextFloat(0.3f, 1.1f));
-            dust2.scale = Main.rand.NextFloat(0.9f, 2.4f);
-            dust2.noGravity = true;
-        }
     }
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
@@ -289,10 +267,9 @@ public class GrowthSwing : ScythePro
             spriteEffects |= SpriteEffects.FlipHorizontally;
             lightColor = Color.Green;
             lightColor.A = 0;
-            texture = (Texture2D)ModContent.Request<Texture2D>("CalamityMod/Particles/TrientCircularSmear");
-            Main.EntitySpriteDraw(texture, player.MountedCenter - new Vector2(4f, 2f) * player.Directions - Main.screenPosition, null, lightColor * swingTime, Projectile.rotation, texture.Size() / 2f, Projectile.scale * 1.7f, spriteEffects);
-            texture = (Texture2D)ModContent.Request<Texture2D>("CalamityMod/Particles/SlashSmear");
-            Main.EntitySpriteDraw(texture, player.MountedCenter - new Vector2(4f, 2f) * player.Directions - Main.screenPosition, null, lightColor * swingTime * 0.7f, Projectile.rotation, texture.Size() / 2f, Projectile.scale * 1.1f, spriteEffects);
+            texture = TextureAssets.Projectile[ProjectileID.Excalibur].Value; // 156x156
+            var frame = texture.Frame(1, 4, 0, (int)(swingTime - (swingTime % 1f)));
+            Main.EntitySpriteDraw(texture, player.MountedCenter - new Vector2(4f, 2f) * player.Directions - Main.screenPosition, frame, (lightColor * (swingTime / 2f)) with { A = 10 }, Projectile.rotation + Pi * Projectile.spriteDirection * player.direction, frame.Size() / 2f, Projectile.scale * 1.5f, spriteEffects);
         }
         return false;
     }
@@ -317,7 +294,33 @@ public class GrowthSwing : ScythePro
         }
         return null;
     }
-
 }
+
+public class LeafNoCollision : GlobalProjectile
+{
+    public override bool AppliesToEntity(Projectile entity, bool lateInstantiation)
+    {
+        return entity.type == ProjectileID.Leaf;
+    }
+
+    public override bool InstancePerEntity => true;
+
+    public override void OnSpawn(Projectile projectile, IEntitySource source)
+    {
+        if (source is not null && source.Context is not null && source.Context == "NoTileCollide")
+            projectile.tileCollide = false;
+    }
+
+    public override void SendExtraAI(Projectile projectile, BitWriter bitWriter, BinaryWriter binaryWriter)
+    {
+        bitWriter.WriteBit(projectile.tileCollide);
+    }
+
+    public override void ReceiveExtraAI(Projectile projectile, BitReader bitReader, BinaryReader binaryReader)
+    {
+        projectile.tileCollide = bitReader.ReadBit();
+    }
+}
+
 
 
