@@ -13,7 +13,7 @@ namespace HWJBardHealer.Content.Accessories.Bard
     {
         public override void SetBardDefaults()
         {
-            accDamage = "35 basic damage";
+            accDamage = "100 basic damage";
             Item.width = 28;
             Item.height = 28;
             Item.value = Item.sellPrice(0, 0, 30, 0);
