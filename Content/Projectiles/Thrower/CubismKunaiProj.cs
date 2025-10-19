@@ -5,7 +5,6 @@ using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
-using CalamityMod.Buffs.DamageOverTime;
 using HWJBardHealer.Content.Projectiles.Thrower;
 using ContinentOfJourney.Items.Material;
 
@@ -15,7 +14,6 @@ namespace HWJBardHealer.Content.Projectiles.Thrower
     {
         public override void SetStaticDefaults()
         {
-            // DisplayName.SetDefault("Cubism Kunai");
         }
 
         public override void SetDefaults()
@@ -69,7 +67,6 @@ namespace HWJBardHealer.Content.Projectiles.Thrower
 
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
-            target.AddBuff(ModContent.BuffType<Vaporfied>(), 180);
             Terraria.Audio.SoundEngine.PlaySound(SoundID.Item62, Projectile.position);
 
             // Spawn cube particles
