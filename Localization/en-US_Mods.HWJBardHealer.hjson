@@ -3,6 +3,11 @@ Buffs: {
 		DisplayName: Bubble Shield
 		Description: Reduces next damage by 10%
 	}
+
+	SpaceBarrierBuff: {
+		DisplayName: Space Barrier
+		Description: Grants 10% increased damage and 5 defense
+	}
 }
 
 Items: {
@@ -20,6 +25,96 @@ Items: {
 		DisplayName: Cubism Kunai
 		Tooltip: ""
 	}
+
+	ForbiddenGrowth: {
+		DisplayName: Forbidden Growth
+		Tooltip: ""
+	}
+
+	LittleDipper: {
+		DisplayName: Little Dipper
+		Tooltip: ""
+	}
+
+	EyeOfDepths: {
+		DisplayName: Divers Trituba
+		Tooltip: ""
+	}
+
+	DipperWand: {
+		DisplayName: Andromedan Scepter
+		Tooltip: ""
+	}
+
+	Serenity: {
+		DisplayName: Serenity
+		Tooltip: ""
+	}
+
+	Sunrise: {
+		DisplayName: Sunrise
+		Tooltip: ""
+	}
+
+	MansFolly: {
+		Tooltip: ""
+		DisplayName: Mans Folly
+	}
+
+	DipperTrumpet: {
+		Tooltip: ""
+		DisplayName: Falling Constellation
+	}
+
+	MysterySong: {
+		DisplayName: Mystery Song
+		Tooltip: ""
+	}
+
+	DiurnalCycle: {
+		DisplayName: Diurnal Cycle
+		Tooltip: ""
+	}
+
+	LifePetal: {
+		Tooltip:
+			'''
+			Percussion damage has a 25% chance to activate a 'reanimation petal', which orbits around the player 
+			Allies that touch an activated petal gain a massive healing boost 
+			Enemies that touch an activated petal take damage and get poisoned
+			'''
+		DisplayName: Life Petal
+	}
+
+	BardBadge: {
+		DisplayName: Bard Badge
+		Tooltip: ""
+	}
+
+	ClericBadge: {
+		DisplayName: Cleric Badge
+		Tooltip: ""
+	}
+
+	DeluxeDewCollector: {
+		DisplayName: Deluxe Dew Collector
+		Tooltip: ""
+	}
+
+	RogueBadge: {
+		DisplayName: Rogue Badge
+		Tooltip: ""
+	}
+
+	TheBibleOfTheThrowerVol4: {
+		DisplayName: The Bible Of The Thrower: Volume IV
+		Tooltip: ""
+	}
+
+	PuppetShow: {
+		DisplayName: Puppet Show
+		Tooltip: ""
+	}
 }
 
 Projectiles: {
@@ -29,5 +124,30 @@ Projectiles: {
 	RodScythePro.DisplayName: Rod Scythe Pro
 	CubismKunaiProj.DisplayName: Cubism Kunai Proj
 	FissionThrow_2.DisplayName: Fission Throw_2
+	ForbiddenFruit.DisplayName: Forbidden Fruit
+	GrowthSwing.DisplayName: Growth Swing
+	LittleDipperProj.DisplayName: Little Dipper Proj
+	LittleDipperSparkle.DisplayName: Little Dipper Sparkle
+	EyeOfDepthsProj.DisplayName: Eye Of Depths Proj
+	DipperDroneProj.DisplayName: Dipper Drone Proj
+	DipperWandProj.DisplayName: Dipper Wand Proj
+	SerenityBlessingProj.DisplayName: Serenity Blessing Proj
+	SerenityFlareProj.DisplayName: Serenity Flare Proj
+	SunriseProj.DisplayName: Sunrise Proj
+	FollyProj.DisplayName: Folly Proj
+	LifeEnergy.DisplayName: Life Energy
+	DipperTrumpetProj.DisplayName: Dipper Trumpet Proj
+	MysterySongProj.DisplayName: Mystery Song Proj
+	DiurnalCycleBeam.DisplayName: Diurnal Cycle Beam
+	DiurnalCycleStar.DisplayName: Diurnal Cycle Star
+	LifePetalProj.DisplayName: Life Petal Proj
+	PuppetShowProj.DisplayName: Puppet Show Proj
+	TomatoPuppet.DisplayName: Tomato Puppet
+	TomatoProj.DisplayName: Tomato Proj
 }
 
+ItemTooltips.ScytheThrow:
+	'''
+	Right Click to throw the Scythe, which will curve on it's way back
+	Thrown Scythes will deal 10% reduced damage
+	'''
