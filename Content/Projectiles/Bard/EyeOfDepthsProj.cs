@@ -11,7 +11,7 @@ namespace HWJBardHealer.Content.Projectiles.Bard
 {
     public class EyeOfDepthsProj : BardProjectile
     {
-        public override string Texture => "CalamityMod/Particles/HollowCircleHardEdge";
+        public override string Texture => "HWJBardHealer/Content/Projectiles/Bard/EyeOfDepthsProj";
         public override BardInstrumentType InstrumentType => BardInstrumentType.Brass;
 
         public override void SetBardDefaults()
@@ -30,7 +30,6 @@ namespace HWJBardHealer.Content.Projectiles.Bard
 
         public override void AI()
         {
-            // fade in/out
             if (Projectile.timeLeft < 15)
                 Projectile.alpha = Math.Min(255, Projectile.alpha + 20);
             else
@@ -47,11 +46,9 @@ namespace HWJBardHealer.Content.Projectiles.Bard
             Projectile.height = newSize;
             Projectile.Center = oldCenter;
 
-            // face velocity
             if (Projectile.velocity.LengthSquared() > 0.1f)
                 Projectile.rotation = Projectile.velocity.ToRotation();
 
-            // bubble trail
             for (int i = 0; i < 2; i++)
             {
                 int dust = Dust.NewDust(
@@ -75,7 +72,6 @@ namespace HWJBardHealer.Content.Projectiles.Bard
         {
             Projectile.damage = Math.Max(1, Projectile.damage - 4);
 
-            // bubbles
             for (int i = 0; i < 20; i++)
             {
                 Vector2 vel = Main.rand.NextVector2Circular(3f, 3f);
@@ -83,7 +79,6 @@ namespace HWJBardHealer.Content.Projectiles.Bard
                 Main.dust[dust].noGravity = true;
             }
 
-            // mini bubble
             int numProjectiles = 5;
             for (int i = 0; i < numProjectiles; i++)
             {
@@ -106,7 +101,6 @@ namespace HWJBardHealer.Content.Projectiles.Bard
             Vector2 origin = texture.Size() / 2f;
             float fade = 1f - Projectile.alpha / 255f;
 
-            // glow 
             Color glowColor = new Color(100, 120, 200, 0) * fade * 0.6f;
             Main.EntitySpriteDraw(
                 texture,
@@ -120,7 +114,6 @@ namespace HWJBardHealer.Content.Projectiles.Bard
                 0
             );
 
-            // outer ring
             Color edgeColor = new Color(63, 66, 110, 0) * fade;
             Main.EntitySpriteDraw(
                 texture,
@@ -134,7 +127,6 @@ namespace HWJBardHealer.Content.Projectiles.Bard
                 0
             );
 
-            // inner ring
             Color centerColor = new Color(120, 130, 200, 0) * fade;
             Main.EntitySpriteDraw(
                 texture,
