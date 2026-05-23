@@ -3,7 +3,7 @@ using Terraria;
 using Terraria.GameContent;
 using Terraria.ModLoader;
 
-namespace TestMod;
+namespace HWJBardHealer.Content.Projectiles.Thrower;
 
 public class FollyProj : ModProjectile
 {

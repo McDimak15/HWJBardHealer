@@ -31,7 +31,7 @@ namespace HWJBardHealer.Content.Accessories.Bard
             Recipe recipe = CreateRecipe();
             recipe.AddIngredient(ModContent.ItemType<KickPetal>(), 1);
             recipe.AddIngredient(ModContent.ItemType<EssenceofLife>(), 5);
-            recipe.AddTile(ModContent.TileType<FinalAnvil> ());
+            recipe.AddTile(ModContent.TileType<FountainofLife>());
             recipe.Register();
         }
     }

@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
@@ -33,6 +34,7 @@ namespace HWJBardHealer.Content.Projectiles.Thrower
             Projectile.tileCollide = true;
             Projectile.ignoreWater = false;
             Projectile.DamageType = DamageClass.Throwing;
+            Projectile.netUpdate = true;
         }
 
         public override void AI()
@@ -126,7 +128,7 @@ namespace HWJBardHealer.Content.Projectiles.Thrower
             }
         }
 
-        public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
             Projectile.ai[0] = 1f;
             Projectile.ai[1] = target.whoAmI;
@@ -183,20 +185,24 @@ namespace HWJBardHealer.Content.Projectiles.Thrower
                         float distance = Vector2.Distance(npc.Center, Projectile.Center);
                         if (distance < radius)
                         {
-                            npc.StrikeNPC(new NPC.HitInfo
+
+                            NPC.HitInfo hitInfo = new NPC.HitInfo
                             {
                                 Damage = damage,
                                 Knockback = 3f,
                                 HitDirection = npc.Center.X < Projectile.Center.X ? -1 : 1,
                                 Crit = Main.rand.NextBool(5)
-                            });
-
-                            npc.AddBuff(ModContent.BuffType<Singed>(), 180);
+                            };
+                            npc.StrikeNPC(hitInfo);
+                            NetMessage.SendStrikeNPC(npc, hitInfo);
                         }
                     }
                 }
             }
+            NetMessage.SendData(MessageID.SyncProjectile, -1, -1, null, Projectile.whoAmI);
+            Projectile.netUpdate = true;
         }
+
 
         public override void OnKill(int timeLeft)
         {
@@ -255,6 +261,20 @@ namespace HWJBardHealer.Content.Projectiles.Thrower
             );
 
             return false;
+        }
+
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.Write(explosionActive);
+            writer.Write(explosionScale);
+            writer.Write(explosionAlpha);
+        }
+
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            explosionActive = reader.ReadBoolean();
+            explosionScale = reader.ReadSingle();
+            explosionAlpha = reader.ReadSingle();
         }
     }
 }

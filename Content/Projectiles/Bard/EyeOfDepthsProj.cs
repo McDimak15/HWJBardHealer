@@ -5,6 +5,7 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.ID;
 using ThoriumMod;
+using ThoriumMod.Sounds;
 using ThoriumMod.Projectiles.Bard;
 
 namespace HWJBardHealer.Content.Projectiles.Bard
@@ -30,6 +31,11 @@ namespace HWJBardHealer.Content.Projectiles.Bard
 
         public override void AI()
         {
+            if (Projectile.timeLeft == 60)
+            {
+                Terraria.Audio.SoundEngine.PlaySound(ThoriumSounds.Nocturne_Sound, Projectile.position);
+            }
+
             if (Projectile.timeLeft < 15)
                 Projectile.alpha = Math.Min(255, Projectile.alpha + 20);
             else

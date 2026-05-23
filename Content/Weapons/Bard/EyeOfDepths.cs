@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -18,9 +19,16 @@ namespace HWJBardHealer.Content.Weapons.Bard
     {
         public override BardInstrumentType InstrumentType => BardInstrumentType.Brass;
 
+        public override void BardTooltips(List<TooltipLine> tooltips)
+        {
+            tooltips.Add(new TooltipLine(Mod, "EyeOfDepthsTooltip",
+                "“You hear strange voices from the mouth of the tuba”")
+            {
+                OverrideColor = new Color(53, 54, 112)
+            });
+        }
         public override void SetStaticDefaults()
         {
-            if (ModLoader.HasMod("CalamityBardHealer")){Empowerments.AddInfo<EmpowermentProlongation>(1, 0);}
             Empowerments.AddInfo<Damage>(1, 0);
             Empowerments.AddInfo<FlatDamage>(3, 0);
             Empowerments.AddInfo<CriticalStrikeChance>(3, 0);
@@ -64,6 +72,11 @@ namespace HWJBardHealer.Content.Weapons.Bard
                 velocity.Normalize();
                 position = player.MountedCenter + velocity * 30f; 
             }
+
+            if (Main.myPlayer == player.whoAmI)
+            {
+                SoundEngine.PlaySound(ThoriumSounds.Nocturne_Sound, player.position);
+            }
         }
 
         public override void AddRecipes()
@@ -75,7 +88,6 @@ namespace HWJBardHealer.Content.Weapons.Bard
             recipe.AddIngredient(ModContent.Find<ModItem>("ThoriumMod", "ScubaCurva"), 1);
             recipe.AddIngredient(ModContent.Find<ModItem>("ThoriumMod", "TwentyFourCaratTuba"), 1);
             recipe.AddIngredient(ModContent.Find<ModItem>("ThoriumMod", "SerpentsCry"), 1);
-            if (ModLoader.HasMod("CalamityBardHealer")){recipe.AddIngredient(ModContent.Find<ModItem>("CalamityBardHealer", "WulfrumMegaphone"), 1);}
             recipe.AddTile(TileID.MythrilAnvil);
             recipe.Register();
         }

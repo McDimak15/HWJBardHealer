@@ -37,7 +37,7 @@ namespace HWJBardHealer.Content.Weapons.Healer
             Item.knockBack = 3f;
             Item.value = Item.sellPrice(0, 1, 0, 0);
             Item.rare = ItemRarityID.Orange;
-            Item.UseSound = SoundID.Item24;
+            Item.UseSound = new SoundStyle?(SoundID.Item24);
             Item.autoReuse = true;
 
             Item.shoot = ModContent.ProjectileType<Projectiles.Healer.DipperWandProj>();

@@ -8,6 +8,7 @@ using Terraria.Localization;
 using Terraria.DataStructures;
 using Terraria.GameContent; 
 using System;
+using System.IO;
 using HWJBardHealer.Content.Weapons.Healer;
 using ThoriumMod.Utilities; 
 
@@ -16,9 +17,8 @@ namespace HWJBardHealer.Content.Projectiles.Healer
 {
     public class SerenityBlessingProj : ModProjectile
     {
-        private int illumination = 100;
         private int flareTimer;
-        private int clickCooldown;
+        private int flareDelayTimer;
 
         private bool exploded;
         private bool wasMousePressedLastTick;
@@ -36,10 +36,6 @@ namespace HWJBardHealer.Content.Projectiles.Healer
 
         private const int BaseInterval = 60; 
 
-        // False = heal 
-        // true = damage
-        private readonly bool TESTING_MODE = false;
-
         public override void SetDefaults()
         {
             Projectile.width = 40;
@@ -55,12 +51,18 @@ namespace HWJBardHealer.Content.Projectiles.Healer
         {
             Player player = Main.player[Projectile.owner];
 
-            if (explosionActive)
+            if (Projectile.localAI[0] == 0f)
             {
-                Projectile.timeLeft = Math.Max(Projectile.timeLeft, 2); 
+                Projectile.localAI[0] = 1f;
+                Projectile.ai[0] = 100f; 
+                SoundEngine.PlaySound(SoundID.Item44 with { Volume = 0.8f }, player.Center);
+                Projectile.netUpdate = true;
             }
 
-            if (!explosionActive && (!player.active || player.dead || player.HeldItem.type != ModContent.ItemType<Weapons.Healer.Serenity>()))
+            Projectile.timeLeft = 2;
+            Projectile.Center = player.Center + new Vector2(0, -50f);
+
+            if (!player.active || player.dead || player.HeldItem.type != ModContent.ItemType<Weapons.Healer.Serenity>())
             {
                 if (!exploded) Projectile.Kill();
                 return;
@@ -68,47 +70,43 @@ namespace HWJBardHealer.Content.Projectiles.Healer
 
             if (explosionActive)
             {
+                Projectile.timeLeft = Math.Max(Projectile.timeLeft, 2);
                 explosionScale += 0.08f;
                 explosionAlpha -= 0.05f;
                 if (explosionAlpha <= 0f)
                     Projectile.Kill();
+                NetMessage.SendData(MessageID.SyncProjectile, -1, -1, null, Projectile.whoAmI);
                 return;
             }
 
-            Projectile.Center = player.Center + new Vector2(0, -50f);
-            Projectile.timeLeft = 2;
-
-            if (illumination > 0)
+            if (Main.myPlayer == Projectile.owner && Projectile.ai[0] > 0)
             {
                 if (Main.GameUpdateCount % 3 == 0)
                 {
-                    illumination--;
+                    Projectile.ai[0]--;
+                    Projectile.netUpdate = true;
                 }
-                if (Main.GameUpdateCount % 17 == 0)
-                {
-                    illumination--;
-                }
-                if (illumination < 0) illumination = 0;
             }
 
-            // Clicking
+
             bool mousePressed = Main.mouseLeft;
             if (mousePressed && !wasMousePressedLastTick)
             {
-                illumination = Math.Min(MaxIllumination, illumination + 5);
+                Projectile.ai[0] = Math.Min(MaxIllumination, Projectile.ai[0] + 5f);
                 SoundEngine.PlaySound(SoundID.Item4 with { Volume = 0.6f, Pitch = 0.2f }, Projectile.Center);
 
                 for (int i = 0; i < 8; i++)
                 {
-                    int d = Dust.NewDust(Projectile.Center, 0, 0, DustID.PinkTorch, Main.rand.NextFloat(-2, 2), Main.rand.NextFloat(-2, 2), 100, default, 1.2f);
+                    int d = Dust.NewDust(Projectile.Center, 0, 0, DustID.PinkTorch,
+                        Main.rand.NextFloat(-2, 2), Main.rand.NextFloat(-2, 2), 100, default, 1.2f);
                     Main.dust[d].noGravity = true;
                 }
+
+                Projectile.netUpdate = true;
             }
             wasMousePressedLastTick = mousePressed;
 
-            if (clickCooldown > 0) clickCooldown--;
-
-            if (illumination <= 0 && !exploded)
+            if (Projectile.ai[0] <= 0 && !exploded)
             {
                 Explosion(player);
                 return;
@@ -118,8 +116,9 @@ namespace HWJBardHealer.Content.Projectiles.Healer
             if (flareTimer >= BaseInterval)
             {
                 flareTimer = 0;
+                flareDelayTimer = 0;
 
-                int flareCount = Math.Min(4, Math.Max(1, illumination / 50));
+                int flareCount = Math.Min(4, Math.Max(1, (int)(Projectile.ai[0] / 50f)));
                 int healPerFlare = flareCount switch
                 {
                     1 => 6,
@@ -129,27 +128,23 @@ namespace HWJBardHealer.Content.Projectiles.Healer
                     _ => 6
                 };
 
-                Projectile.localAI[0] = flareCount - 1; 
-                Projectile.localAI[1] = healPerFlare;
-                Projectile.localAI[2] = 0; 
-
-                FireFlare(player, healPerFlare);
+                Projectile.localAI[1] = flareCount;
+                Projectile.localAI[2] = healPerFlare;
             }
 
-            // Spawn
-            if (Projectile.localAI[0] > 0f)
+            if (Projectile.localAI[1] > 0)
             {
-                Projectile.localAI[2] += 1f;
-                if (Projectile.localAI[2] >= 6f)
+                flareDelayTimer++;
+                if (flareDelayTimer >= 8) 
                 {
-                    int healToUse = (int)Projectile.localAI[1];
-                    FireFlare(player, healToUse);
-                    Projectile.localAI[0] -= 1f;
-                    Projectile.localAI[2] = 0f;
+                    flareDelayTimer = 0;
+                    FireFlare(player, (int)Projectile.localAI[2]);
+                    Projectile.localAI[1]--;
                 }
             }
 
-            Lighting.AddLight(Projectile.Center, new Vector3(1.2f, 0.3f, 1.2f) * (illumination / (float)MaxIllumination));
+            float illumNorm = Projectile.ai[0] / MaxIllumination;
+            Lighting.AddLight(Projectile.Center, new Vector3(1.2f, 0.3f, 1.2f) * illumNorm);
         }
 
         private void EnsureRuntimeGlow()
@@ -184,88 +179,49 @@ namespace HWJBardHealer.Content.Projectiles.Healer
         // Flares
         private void FireFlare(Player player, int healAmount)
         {
-            if (TESTING_MODE)
+            Serenity serenity = player.HeldItem.ModItem as Serenity;
+            Player target = null;
+
+            if (serenity != null && serenity.favoritePlayer >= 0)
             {
-                NPC target = null;
-                float closest = 600f;
-                for (int i = 0; i < Main.maxNPCs; i++)
-                {
-                    NPC npc = Main.npc[i];
-                    if (npc.active && !npc.friendly && !npc.dontTakeDamage)
-                    {
-                        float dist = Vector2.Distance(npc.Center, Projectile.Center);
-                        if (dist < closest)
-                        {
-                            closest = dist;
-                            target = npc;
-                        }
-                    }
-                }
+                Player fav = Main.player[serenity.favoritePlayer];
+                if (fav.active && !fav.dead && fav.team == player.team)
+                    target = fav;
+            }
 
-                if (target == null) return;
-
-                Vector2 velocity = (target.Center - Projectile.Center).SafeNormalize(Vector2.UnitY) * 6f;
-                int pid = Projectile.NewProjectile(
-                    Projectile.GetSource_FromThis(),
-                    Projectile.Center,
-                    velocity,
-                    ModContent.ProjectileType<SerenityFlareProj>(),
-                    20,
-                    1f,
-                    Projectile.owner,
-                    target.whoAmI,
-                    1f
-                );
-                if (pid >= 0 && pid < Main.maxProjectiles)
+            if (target == null)
+            {
+                foreach (Player p in Main.player)
                 {
-                    Main.projectile[pid].localAI[0] = healAmount;
-                    Main.projectile[pid].netUpdate = true;
+                    if (!p.active || p.dead || p.whoAmI == player.whoAmI) continue;
+                    if (p.team != player.team) continue;
+                    target = p;
+                    break;
                 }
             }
-            else
+
+            if (target == null) return;
+
+            Vector2 velocity = (target.Center - Projectile.Center).SafeNormalize(Vector2.UnitY) * 6f;
+            int pid = Projectile.NewProjectile(
+                Projectile.GetSource_FromThis(),
+                Projectile.Center,
+                velocity,
+                ModContent.ProjectileType<SerenityFlareProj>(),
+                0,
+                0f,
+                Projectile.owner,
+                target.whoAmI,
+                0f
+            );
+
+            if (pid >= 0 && pid < Main.maxProjectiles)
             {
-                Serenity serenity = player.HeldItem.ModItem as Serenity;
-                Player target = null;
-
-                if (serenity != null && serenity.favoritePlayer >= 0)
-                {
-                    Player fav = Main.player[serenity.favoritePlayer];
-                    if (fav.active && !fav.dead && fav.team == player.team)
-                        target = fav;
-                }
-
-                if (target == null)
-                {
-                    foreach (Player p in Main.player)
-                    {
-                        if (!p.active || p.dead || p.whoAmI == player.whoAmI) continue;
-                        if (p.team != player.team) continue;
-                        target = p;
-                        break;
-                    }
-                }
-
-                if (target == null) return;
-
-                Vector2 velocity = (target.Center - Projectile.Center).SafeNormalize(Vector2.UnitY) * 6f;
-                int pid = Projectile.NewProjectile(
-                    Projectile.GetSource_FromThis(),
-                    Projectile.Center,
-                    velocity,
-                    ModContent.ProjectileType<SerenityFlareProj>(),
-                    0,
-                    0f,
-                    Projectile.owner,
-                    target.whoAmI,
-                    0f
-                );
-
-                if (pid >= 0 && pid < Main.maxProjectiles)
-                {
-                    Main.projectile[pid].localAI[0] = healAmount;
-                    Main.projectile[pid].netUpdate = true;
-                }
+                Main.projectile[pid].localAI[0] = healAmount;
+                NetMessage.SendData(MessageID.SyncProjectile, -1, -1, null, Projectile.whoAmI);
+                Main.projectile[pid].netUpdate = true;
             }
+        
         }
 
         private void Explosion(Player player)
@@ -292,33 +248,31 @@ namespace HWJBardHealer.Content.Projectiles.Healer
             explosionScale = 0f;
             explosionAlpha = 1f;
 
-            Projectile.timeLeft = 30;
-
-            if (Main.myPlayer == player.whoAmI)
-            {
-                // NPC
                 foreach (NPC npc in Main.npc)
                 {
-                    if (npc.active && Vector2.Distance(npc.Center, player.Center) < 600f)
+                    if (npc.active && !npc.friendly && !npc.dontTakeDamage &&
+                        Vector2.Distance(npc.Center, player.Center) < 600f)
                     {
-                        npc.StrikeNPC(new NPC.HitInfo
+                        int direction = npc.Center.X > player.Center.X ? 1 : -1;
+                        NPC.HitInfo hitInfo = new NPC.HitInfo
                         {
                             Damage = dmg,
                             Knockback = 0f,
-                            HitDirection = 0,
+                            HitDirection = direction,
                             Crit = false
-                        });
+                        };
+                        npc.StrikeNPC(hitInfo);
+                        NetMessage.SendStrikeNPC(npc, hitInfo);
                     }
                 }
 
-                // player
                 int bigDamage = 150;
                 player.Hurt(
                     PlayerDeathReason.ByCustomReason(NetworkText.FromLiteral($"{player.name} was consumed by failing Serenity.")),
                     bigDamage,
                     0
                 );
-            }
+            NetMessage.SendData(MessageID.SyncProjectile, -1, -1, null, Projectile.whoAmI);
 
             if (Main.myPlayer == player.whoAmI)
             {
@@ -336,7 +290,7 @@ namespace HWJBardHealer.Content.Projectiles.Healer
 
             EnsureRuntimeGlow();
 
-            float glowAmount = illumination / (float)MaxIllumination;
+            float glowAmount = (float)Projectile.ai[0] / MaxIllumination;
             float pulse = 1f + (float)Math.Sin(Main.GlobalTimeWrappedHourly * 6f) * 0.05f;
             float glowScale = (0.8f + 0.6f * glowAmount) * pulse;
 
@@ -366,7 +320,7 @@ namespace HWJBardHealer.Content.Projectiles.Healer
                 SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullNone, null,
                 Main.GameViewMatrix.TransformationMatrix);
 
-            float scale = (1f + (illumination / (float)MaxIllumination) * 0.2f) * 1.2f;
+            float scale = (1f + (Projectile.ai[0] / (float)MaxIllumination) * 0.2f) * 1.2f;
             Color idolColor = Color.White;
 
             Main.EntitySpriteDraw(
@@ -384,7 +338,7 @@ namespace HWJBardHealer.Content.Projectiles.Healer
             // Bar
             Vector2 barWorldPos = Projectile.Center + new Vector2(0f, 90f); 
             Vector2 barScreenPos = barWorldPos - Main.screenPosition;
-            float progress = illumination / (float)MaxIllumination;
+            float progress = Projectile.ai[0] / (float)MaxIllumination;
             int barWidth = 90;
             int barHeight = 10;
 
@@ -444,10 +398,26 @@ namespace HWJBardHealer.Content.Projectiles.Healer
                     SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullNone, null,
                     Main.GameViewMatrix.TransformationMatrix);
 
+                NetMessage.SendData(MessageID.SyncProjectile, -1, -1, null, Projectile.whoAmI);
                 return false;
             }
 
             return false;
+        }
+
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.Write(explosionActive);
+            writer.Write(explosionScale);
+            writer.Write(explosionAlpha);
+        }
+
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            explosionActive = reader.ReadBoolean();
+            explosionScale = reader.ReadSingle();
+            explosionAlpha = reader.ReadSingle();
+            ModContent.GetInstance<HWJBardHealer>().Logger.Info($"[Sunrise] explosionAlpha = {explosionAlpha}");
         }
     }
 }

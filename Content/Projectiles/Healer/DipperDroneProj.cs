@@ -31,7 +31,7 @@ namespace HWJBardHealer.Content.Projectiles.Healer
 
         public override void SetStaticDefaults()
         {
-            Main.projFrames[Projectile.type] = 4; 
+            Main.projFrames[Projectile.type] = 4;
         }
 
         public override void SetDefaults()
@@ -45,30 +45,33 @@ namespace HWJBardHealer.Content.Projectiles.Healer
             Projectile.timeLeft = 60 * 15;
         }
 
-        public override void OnSpawn(IEntitySource source)
-        {
-            for (int i = 0; i < Main.maxProjectiles; i++)
-            {
-                Projectile other = Main.projectile[i];
-                if (other.active && other.type == Projectile.type && other.whoAmI != Projectile.whoAmI)
-                {
-                    Projectile.Kill();
-                    return;
-                }
-            }
-        }
-
         public override void AI()
         {
-            Projectile.velocity = Vector2.Zero;
+            if (Projectile.timeLeft == 60 * 15)
+            {
+                Projectile.netUpdate = true;
 
+                if (Main.myPlayer == Projectile.owner)
+                {
+                    for (int i = 0; i < Main.maxProjectiles; i++)
+                    {
+                        Projectile other = Main.projectile[i];
+                        if (other.active && other.type == Projectile.type && other.whoAmI != Projectile.whoAmI && other.owner == Projectile.owner)
+                        {
+                            Projectile.Kill();
+                            return;
+                        }
+                    }
+                }
+            }
+
+            Projectile.velocity = Vector2.Zero;
             floatTimer += 0.05f;
             Projectile.position.Y += (float)Math.Sin(floatTimer) * 0.3f;
 
             if (appearProgress < 1f)
                 appearProgress += 0.05f;
 
-            // Explosion
             if (Projectile.timeLeft == 1 && !explosionActive)
             {
                 if (Main.myPlayer == Projectile.owner)
@@ -104,16 +107,16 @@ namespace HWJBardHealer.Content.Projectiles.Healer
                 explosionScale += 0.08f;
                 explosionAlpha -= 0.05f;
                 if (explosionAlpha <= 0f)
-                {
                     Projectile.Kill();
-                }
-                return; 
+
+                return;
             }
 
             for (int i = 0; i < Main.maxPlayers; i++)
             {
                 Player player = Main.player[i];
-                if (!player.active || player.dead) continue;
+                if (!player.active || player.dead)
+                    continue;
 
                 bool inside = Vector2.Distance(player.Center, Projectile.Center) < Radius;
 
@@ -172,7 +175,6 @@ namespace HWJBardHealer.Content.Projectiles.Healer
             }
         }
 
-
         private void OnEnterAura(Player player)
         {
             for (int i = 0; i < 15; i++)
@@ -181,7 +183,6 @@ namespace HWJBardHealer.Content.Projectiles.Healer
                 int dust = Dust.NewDust(player.Center, 0, 0, DustID.Electric, vel.X, vel.Y, 150, default, 1.3f);
                 Main.dust[dust].noGravity = true;
             }
-
             SoundEngine.PlaySound(SoundID.Item29 with { Volume = 0.6f, Pitch = 0.2f }, player.Center);
         }
 
@@ -218,10 +219,12 @@ namespace HWJBardHealer.Content.Projectiles.Healer
 
         public override void OnKill(int timeLeft)
         {
-            if (timeLeft <= 0)
+            if (!explosionActive)
             {
-                int explosionDamage = Projectile.originalDamage;
-                int explosionKnockback = 6;
+                explosionActive = true;
+                explosionScale = 0f;
+                explosionAlpha = 1f;
+
                 if (Main.myPlayer == Projectile.owner)
                 {
                     Projectile.NewProjectile(
@@ -229,15 +232,11 @@ namespace HWJBardHealer.Content.Projectiles.Healer
                         Projectile.Center,
                         Vector2.Zero,
                         ProjectileID.DD2ExplosiveTrapT1Explosion,
-                        explosionDamage,
-                        explosionKnockback,
+                        Projectile.originalDamage,
+                        6,
                         Projectile.owner
                     );
                 }
-
-                explosionActive = true;
-                explosionScale = 0f;
-                explosionAlpha = 1f;
 
                 for (int i = 0; i < 30; i++)
                 {
@@ -250,8 +249,6 @@ namespace HWJBardHealer.Content.Projectiles.Healer
             }
         }
 
-
-
         public override bool PreDraw(ref Color lightColor)
         {
             Texture2D circleTex = ModContent.Request<Texture2D>("HWJBardHealer/Content/Projectiles/Healer/FadeCircle").Value;
@@ -259,7 +256,7 @@ namespace HWJBardHealer.Content.Projectiles.Healer
             if (explosionActive)
             {
                 float baseScale = Radius / (circleTex.Width / 2f);
-                float drawScale = baseScale * explosionScale * 2.5f; 
+                float drawScale = baseScale * explosionScale * 2.5f;
                 Color explosionColor = new Color(220, 255, 255, 200) * explosionAlpha;
 
                 Main.spriteBatch.End();
@@ -267,42 +264,24 @@ namespace HWJBardHealer.Content.Projectiles.Healer
                     SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullNone, null,
                     Main.GameViewMatrix.TransformationMatrix);
 
-                Main.EntitySpriteDraw(
-                    circleTex,
-                    Projectile.Center - Main.screenPosition,
-                    null,
-                    explosionColor,
-                    0f,
-                    circleTex.Size() / 2f,
-                    drawScale,
-                    SpriteEffects.None,
-                    0
-                );
+                Main.EntitySpriteDraw(circleTex, Projectile.Center - Main.screenPosition, null, explosionColor,
+                    0f, circleTex.Size() / 2f, drawScale, SpriteEffects.None, 0);
 
                 Main.spriteBatch.End();
                 Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend,
                     SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullNone, null,
                     Main.GameViewMatrix.TransformationMatrix);
 
-                return false; 
+                return false;
             }
 
             Texture2D droneTex = ModContent.Request<Texture2D>("HWJBardHealer/Content/Projectiles/Healer/DipperDroneProj").Value;
             int frameHeight = droneTex.Height / Main.projFrames[Projectile.type];
             Rectangle frame = new Rectangle(0, Projectile.frame * frameHeight, droneTex.Width, frameHeight);
-            Vector2 origin = new(frame.Width / 2f, frameHeight / 2f);
+            Vector2 origin = new Vector2(frame.Width / 2f, frameHeight / 2f);
 
-            Main.EntitySpriteDraw(
-                droneTex,
-                Projectile.Center - Main.screenPosition,
-                frame,
-                Color.White,
-                0f,
-                origin,
-                appearProgress,
-                SpriteEffects.None,
-                0
-            );
+            Main.EntitySpriteDraw(droneTex, Projectile.Center - Main.screenPosition, frame,
+                Color.White, 0f, origin, appearProgress, SpriteEffects.None, 0);
 
             float baseScaleAura = (Radius / (circleTex.Width / 2f)) * appearProgress;
             Color auraColor = new Color(180, 240, 255, 230) * appearProgress;
@@ -314,34 +293,16 @@ namespace HWJBardHealer.Content.Projectiles.Healer
                 SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullNone, null,
                 Main.GameViewMatrix.TransformationMatrix);
 
-            Main.EntitySpriteDraw(
-                circleTex,
-                Projectile.Center - Main.screenPosition,
-                null,
-                auraColor,
-                0f,
-                circleTex.Size() / 2f,
-                baseScaleAura,
-                SpriteEffects.None,
-                0
-            );
+            Main.EntitySpriteDraw(circleTex, Projectile.Center - Main.screenPosition, null, auraColor,
+                0f, circleTex.Size() / 2f, baseScaleAura, SpriteEffects.None, 0);
 
             if (circleActive)
             {
                 float innerScale = baseScaleAura * circleScale;
                 Color pulseColor = new Color(200, 255, 255, 240) * circleAlpha * appearProgress;
 
-                Main.EntitySpriteDraw(
-                    circleTex,
-                    Projectile.Center - Main.screenPosition,
-                    null,
-                    pulseColor,
-                    0f,
-                    circleTex.Size() / 2f,
-                    innerScale,
-                    SpriteEffects.None,
-                    0
-                );
+                Main.EntitySpriteDraw(circleTex, Projectile.Center - Main.screenPosition, null,
+                    pulseColor, 0f, circleTex.Size() / 2f, innerScale, SpriteEffects.None, 0);
             }
 
             Main.spriteBatch.End();
@@ -351,6 +312,5 @@ namespace HWJBardHealer.Content.Projectiles.Healer
 
             return false;
         }
-
     }
 }

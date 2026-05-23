@@ -60,6 +60,11 @@ namespace HWJBardHealer.Content.Weapons.Bard
                 velocity.Normalize();
                 position = player.MountedCenter + velocity * 30f;
             }
+
+            if (Main.myPlayer == player.whoAmI)
+            {
+                SoundEngine.PlaySound(ThoriumSounds.Trumpet_Sound, player.position);
+            }
         }
 
         public class DipperTrumpetDrop : GlobalItem

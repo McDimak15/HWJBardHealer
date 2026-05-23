@@ -7,8 +7,9 @@ using Terraria.ModLoader;
 using ThoriumMod.Items.HealerItems;
 using ContinentOfJourney.Items.Material;
 using ContinentOfJourney.Tiles;
+using HWJBardHealer.Content.Projectiles.Healer;
 
-namespace TestMod;
+namespace HWJBardHealer.Content.Weapons.Healer;
 
 public class ForbiddenGrowth : ScytheItem
 {
@@ -25,7 +26,7 @@ public class ForbiddenGrowth : ScytheItem
     public override void SetDefaults()
     {
         SetDefaultsToScythe();
-        Item.damage = 77;
+        Item.damage = 520;
         scytheSoulCharge = 3;
         Item.width = 136;
         Item.height = 156;
@@ -33,8 +34,8 @@ public class ForbiddenGrowth : ScytheItem
         Item.holdStyle = 6;
         Item.useStyle = 100;
         Item.noUseGraphic = false;
-        Item.useTime = 24;
-        Item.useAnimation = 24;
+        Item.useTime = 22;
+        Item.useAnimation = 22;
         Item.shoot = ModContent.ProjectileType<GrowthSwing>();
     }
 
@@ -60,7 +61,7 @@ public class ForbiddenGrowth : ScytheItem
 
     public override void HoldStyle(Player player, Rectangle itemFrame)
     {
-        player.itemLocation += new Vector2(-60f, 25f) * player.Directions;
+        player.itemLocation += new Vector2(-20f, 20f) * player.Directions;
     }
 
     public override void UseStyle(Player player, Rectangle itemFrame)

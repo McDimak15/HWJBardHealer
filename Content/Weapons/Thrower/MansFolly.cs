@@ -2,8 +2,11 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using ThoriumMod;
+using ContinentOfJourney.Items.Material;
+using ContinentOfJourney.Tiles;
+using HWJBardHealer.Content.Projectiles.Thrower;
 
-namespace TestMod;
+namespace HWJBardHealer.Content.Weapons.Thrower;
 
 public class MansFolly : ModItem
 {
@@ -30,5 +33,14 @@ public class MansFolly : ModItem
         Item.shoot = ModContent.ProjectileType<FollyProj>();
         Item.shootSpeed = 8;
         Item.UseSound = SoundID.Item18;
+    }
+
+    public override void AddRecipes()
+    {
+        CreateRecipe()
+            .AddIngredient(ModContent.ItemType<EssenceofLife>(), 2)
+            .AddIngredient(ModContent.ItemType<LivingBar>(), 10)
+            .AddTile(ModContent.TileType<FountainofLife>())
+            .Register();
     }
 }

@@ -6,6 +6,7 @@ using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.DataStructures;
+using Terraria.Utilities;
 using ThoriumMod;
 using ThoriumMod.Projectiles.Bard;
 
@@ -41,6 +42,7 @@ namespace HWJBardHealer.Content.Projectiles.Bard
             Projectile.timeLeft = 180;
             Projectile.extraUpdates = 1;
             Projectile.DamageType = ThoriumDamageBase<BardDamage>.Instance;
+            Projectile.netUpdate = true;
         }
 
         private void EnsureRuntimeGlow()
@@ -72,14 +74,22 @@ namespace HWJBardHealer.Content.Projectiles.Bard
             runtimeGlowTex.SetData(colorData);
         }
 
-        public override void OnSpawn(IEntitySource source)
-        {
-            baseVelocity = Projectile.velocity.SafeNormalize(Vector2.UnitX) * 6f; 
-            waveOffset = Main.rand.NextFloat(0f, MathHelper.TwoPi);
-        }
-
         public override void AI()
         {
+            if (Projectile.localAI[1] == 0f)
+            {
+                Projectile.localAI[1] = 1f;
+
+                Vector2 initDir = Projectile.velocity.SafeNormalize(Vector2.UnitX);
+                baseVelocity = initDir * 6f;
+
+                var random = new UnifiedRandom(Projectile.identity * 999);
+                waveOffset = random.NextFloat(0f, MathHelper.TwoPi);
+
+                SoundEngine.PlaySound(SoundID.Item9 with { Volume = 0.7f, PitchVariance = 0.1f }, Projectile.position);
+                SoundEngine.PlaySound(SoundID.Item91 with { Volume = 0.7f, PitchVariance = 0.1f }, Projectile.position);
+            }
+
             Lighting.AddLight(Projectile.Center, 0.7f, 0.6f, 0.9f);
 
             if (Main.rand.NextBool(4))
@@ -89,14 +99,18 @@ namespace HWJBardHealer.Content.Projectiles.Bard
                 Main.dust[dust].noGravity = true;
             }
 
-            float waveAmplitude = 16f; 
-            float waveFrequency = 0.25f; 
+            if (Main.myPlayer == Projectile.owner)
+                Projectile.localAI[0] += 1f;
 
-            float sine = (float)Math.Sin(Main.GameUpdateCount * waveFrequency + waveOffset);
+            float waveAmplitude = 16f;
+            float waveFrequency = 0.25f;
+
+            float sine = (float)Math.Sin(Projectile.localAI[0] * waveFrequency + waveOffset);
             Vector2 perpendicular = baseVelocity.RotatedBy(MathHelper.PiOver2).SafeNormalize(Vector2.Zero);
             Projectile.velocity = baseVelocity + perpendicular * sine * (waveAmplitude * 0.1f);
-
         }
+
+
 
         public new void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {

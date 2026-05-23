@@ -6,6 +6,7 @@ using Terraria.Audio;
 using Terraria.ModLoader;
 using System;
 using ThoriumMod;
+using ThoriumMod.Sounds;
 using ThoriumMod.Projectiles.Bard;
 
 namespace HWJBardHealer.Content.Projectiles.Bard
@@ -49,6 +50,11 @@ namespace HWJBardHealer.Content.Projectiles.Bard
         public override void AI()
         {
             Player player = Main.player[Projectile.owner];
+
+            if (Projectile.timeLeft == 600)
+            {
+                Terraria.Audio.SoundEngine.PlaySound(ThoriumSounds.Trumpet_Sound, Projectile.position);
+            }
 
             if (!spawned)
             {

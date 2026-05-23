@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.DataStructures;
@@ -18,6 +18,7 @@ namespace HWJBardHealer.Core
             {
                 if (entity.type == HWJbardhealer.Find<ModItem>("OtherworldlyScythe").Type) return true;
                 if (entity.type == HWJbardhealer.Find<ModItem>("RodScythe").Type) return true;
+                if (entity.type == HWJbardhealer.Find<ModItem>("SolsticeHarvester").Type) return true;
             }
 
             foreach (var item in throwableScythes)
@@ -38,6 +39,7 @@ namespace HWJBardHealer.Core
             {
                 if (item.type == HWJbardhealer.Find<ModItem>("OtherworldlyScythe").Type) ThrowDistance = 125f;
                 if (item.type == HWJbardhealer.Find<ModItem>("RodScythe").Type) ThrowDistance = 125f;
+                if (item.type == HWJbardhealer.Find<ModItem>("SolsticeHarvester").Type) ThrowDistance = 140f;
             }
         }
 
@@ -102,6 +104,7 @@ namespace HWJBardHealer.Core
             {
                 if (item.type == HWJbardhealer.Find<ModItem>("OtherworldlyScythe").Type) isThrowableScythe = true;
                 if (item.type == HWJbardhealer.Find<ModItem>("RodScythe").Type) isThrowableScythe = true;
+                if (item.type == HWJbardhealer.Find<ModItem>("SolsticeHarvester").Type) isThrowableScythe = true;
             }
 
             if (isThrowableScythe)

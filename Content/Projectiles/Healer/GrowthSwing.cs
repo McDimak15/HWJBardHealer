@@ -1,4 +1,3 @@
-using CalamityMod.Particles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -8,15 +7,20 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent;
 using Terraria.ID;
+using Terraria.IO;
 using Terraria.ModLoader;
+using Terraria.DataStructures;
 using ThoriumMod.Projectiles.Scythe;
+using HWJBardHealer.Content.Weapons.Healer;
 using static Microsoft.Xna.Framework.MathHelper;
 
-namespace TestMod;
+namespace HWJBardHealer.Content.Projectiles.Healer;
 
 public class GrowthSwing : ScythePro
 {
     private bool shouldSpin;
+
+    public override string Texture => "HWJBardHealer/Content/Weapons/Healer/ForbiddenGrowth";
 
     public override void SafeSetStaticDefaults()
     {
@@ -295,32 +299,5 @@ public class GrowthSwing : ScythePro
         return null;
     }
 }
-
-public class LeafNoCollision : GlobalProjectile
-{
-    public override bool AppliesToEntity(Projectile entity, bool lateInstantiation)
-    {
-        return entity.type == ProjectileID.Leaf;
-    }
-
-    public override bool InstancePerEntity => true;
-
-    public override void OnSpawn(Projectile projectile, IEntitySource source)
-    {
-        if (source is not null && source.Context is not null && source.Context == "NoTileCollide")
-            projectile.tileCollide = false;
-    }
-
-    public override void SendExtraAI(Projectile projectile, BitWriter bitWriter, BinaryWriter binaryWriter)
-    {
-        bitWriter.WriteBit(projectile.tileCollide);
-    }
-
-    public override void ReceiveExtraAI(Projectile projectile, BitReader bitReader, BinaryReader binaryReader)
-    {
-        projectile.tileCollide = bitReader.ReadBit();
-    }
-}
-
 
 

@@ -70,9 +70,6 @@ namespace HWJBardHealer.Content.Weapons.Bard
                     player.whoAmI
                 );
 
-
-            SoundEngine.PlaySound(SoundID.Item9 with { Volume = 0.7f, PitchVariance = 0.1f }, position);
-
             return false;
         }
 

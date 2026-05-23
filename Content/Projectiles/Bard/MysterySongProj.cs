@@ -6,6 +6,7 @@ using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using ThoriumMod;
+using ThoriumMod.Sounds;
 using ThoriumMod.Projectiles.Bard;
 
 namespace HWJBardHealer.Content.Projectiles.Bard
@@ -19,7 +20,7 @@ namespace HWJBardHealer.Content.Projectiles.Bard
 
         public override void SetBardDefaults()
         {
-            Projectile.width = 76; 
+            Projectile.width = 76;
             Projectile.height = 76;
             Projectile.aiStyle = -1;
             Projectile.friendly = true;
@@ -33,6 +34,16 @@ namespace HWJBardHealer.Content.Projectiles.Bard
 
         public override void AI()
         {
+            if (Projectile.timeLeft == 480)
+                SoundEngine.PlaySound(ThoriumSounds.SousNoise, Projectile.Center);
+
+            if (Projectile.ai[0] == 1f && !exploded)
+            {
+                exploded = true;
+                Explode();
+                return;
+            }
+
             Projectile.frameCounter++;
             if (Projectile.frameCounter >= 5)
             {
@@ -46,7 +57,6 @@ namespace HWJBardHealer.Content.Projectiles.Bard
                 if (Projectile.alpha < 0)
                     Projectile.alpha = 0;
             }
-
 
             if (Projectile.timeLeft > 200)
                 Projectile.velocity *= 0.992f;
@@ -93,25 +103,30 @@ namespace HWJBardHealer.Content.Projectiles.Bard
                 }
             }
 
+            Lighting.AddLight(Projectile.Center, 0.35f, 0.1f, 0.5f);
+
             if (Main.rand.NextBool(2))
             {
-                float spawnDistanceOuter = Projectile.width * 1.8f; 
+                float spawnDistanceOuter = Projectile.width * 1.8f;
                 Vector2 spawnPosOuter = Projectile.Center + Main.rand.NextVector2CircularEdge(spawnDistanceOuter, spawnDistanceOuter);
                 Vector2 dirToCenterOuter = (Projectile.Center - spawnPosOuter).SafeNormalize(Vector2.Zero);
                 Vector2 velOuter = dirToCenterOuter * Main.rand.NextFloat(2f, 5f);
 
-                int dustOuter = Dust.NewDust(spawnPosOuter, 0, 0, DustID.Smoke, 0f, 0f, 200, default, 1.6f);
-                Main.dust[dustOuter].velocity = velOuter;
-                Main.dust[dustOuter].noGravity = true;
-                Main.dust[dustOuter].color = Color.Lerp(Color.Black, new Color(10, 0, 10), 0.5f);
-                Main.dust[dustOuter].fadeIn = 1.1f;
-                Main.dust[dustOuter].customData = Projectile.Center;
+                int dustOuter = Dust.NewDust(spawnPosOuter, 0, 0, DustID.Smoke, velOuter.X, velOuter.Y, 200, default, 1.6f);
+                if (dustOuter >= 0 && dustOuter < Main.maxDustToDraw)
+                {
+                    Main.dust[dustOuter].velocity = velOuter;
+                    Main.dust[dustOuter].noGravity = true;
+                    Main.dust[dustOuter].color = Color.Lerp(Color.Black, new Color(10, 0, 10), 0.5f);
+                    Main.dust[dustOuter].fadeIn = 1.1f;
+                    Main.dust[dustOuter].customData = Projectile.Center;
+                }
             }
 
             for (int i = 0; i < Main.maxDustToDraw; i++)
             {
                 Dust d = Main.dust[i];
-                if (d.active && d.customData is Vector2 target)
+                if (d != null && d.active && d.customData is Vector2 target)
                 {
                     Vector2 toCenter = target - d.position;
                     float distance = toCenter.Length();
@@ -129,13 +144,23 @@ namespace HWJBardHealer.Content.Projectiles.Bard
                 }
             }
 
-            Lighting.AddLight(Projectile.Center, 0.35f, 0.1f, 0.5f);
-
-            if (Projectile.timeLeft <= 1 && !exploded)
+            if (Projectile.timeLeft <= 3 && !exploded && Projectile.ai[0] == 0f)
             {
-                Explode();
                 exploded = true;
+                Projectile.ai[0] = 1f;
+                Projectile.timeLeft = 30;
+                Projectile.netUpdate = true;
+
+                Explode();
             }
+
+            if (Projectile.ai[0] == 1f && Projectile.timeLeft < 25)
+            {
+                Projectile.alpha += 10;
+                if (Projectile.alpha > 255)
+                    Projectile.alpha = 255;
+            }
+
         }
 
         private void Explode()
@@ -146,42 +171,26 @@ namespace HWJBardHealer.Content.Projectiles.Bard
             int radius = 220;
             int explosionDamage = (int)(Projectile.damage * 1.7f);
 
-            for (int i = 0; i < Main.maxNPCs; i++)
+            if (Main.netMode != NetmodeID.MultiplayerClient)
             {
-                NPC npc = Main.npc[i];
-                if (npc.active && !npc.friendly && !npc.dontTakeDamage)
+                for (int i = 0; i < Main.maxNPCs; i++)
                 {
-                    float distance = Vector2.Distance(npc.Center, pos);
-                    if (distance < radius)
+                    NPC npc = Main.npc[i];
+                    if (npc.active && !npc.friendly && !npc.dontTakeDamage)
                     {
-                        int hitDamage = (int)(explosionDamage * (1f - distance / radius));
-                        npc.StrikeNPC(new NPC.HitInfo()
+                        float distance = Vector2.Distance(npc.Center, pos);
+                        if (distance < radius)
                         {
-                            Damage = hitDamage,
-                            Knockback = 7f,
-                            HitDirection = npc.Center.X < pos.X ? -1 : 1,
-                            Crit = false
-                        }, true, false);
+                            int hitDamage = (int)(explosionDamage * (1f - distance / radius));
+                            npc.StrikeNPC(new NPC.HitInfo()
+                            {
+                                Damage = hitDamage,
+                                Knockback = 7f,
+                                HitDirection = npc.Center.X < pos.X ? -1 : 1,
+                                Crit = false
+                            }, true, false);
+                        }
                     }
-                }
-            }
-
-            for (int i = 0; i < Main.maxItems; i++)
-            {
-                if (Main.item[i].active)
-                {
-                    Vector2 pushDir = (Main.item[i].Center - pos).SafeNormalize(Vector2.Zero);
-                    Main.item[i].velocity += pushDir * 12f;
-                }
-            }
-
-            for (int i = 0; i < Main.maxNPCs; i++)
-            {
-                NPC npc = Main.npc[i];
-                if (npc.active && !npc.friendly)
-                {
-                    Vector2 pushDir = (npc.Center - pos).SafeNormalize(Vector2.Zero);
-                    npc.velocity += pushDir * 9f;
                 }
             }
 
@@ -189,16 +198,31 @@ namespace HWJBardHealer.Content.Projectiles.Bard
             {
                 Vector2 vel = Main.rand.NextVector2Circular(14f, 14f);
                 int dust = Dust.NewDust(pos, 0, 0, DustID.Smoke, vel.X, vel.Y, 100, default, 1.8f);
-                Main.dust[dust].noGravity = true;
-                Main.dust[dust].color = Color.Black;
+                if (dust >= 0 && dust < Main.maxDustToDraw)
+                {
+                    Main.dust[dust].noGravity = true;
+                    Main.dust[dust].color = Color.Black;
+                }
             }
 
             for (int i = 0; i < 50; i++)
             {
                 Vector2 vel = Main.rand.NextVector2Circular(12f, 12f);
                 int dust = Dust.NewDust(pos, 0, 0, DustID.Smoke, vel.X, vel.Y, 100, default, 1.5f);
-                Main.dust[dust].noGravity = true;
-                Main.dust[dust].color = Color.Black;
+                if (dust >= 0 && dust < Main.maxDustToDraw)
+                {
+                    Main.dust[dust].noGravity = true;
+                    Main.dust[dust].color = Color.Black;
+                }
+            }
+
+            if (Main.netMode != NetmodeID.Server)
+            {
+                for (int i = 0; i < 2; i++)
+                {
+                    Gore.NewGore(Projectile.GetSource_Death(), pos, Main.rand.NextVector2Circular(3f, 3f),
+                        GoreID.Smoke1 + Main.rand.Next(3), 1.2f);
+                }
             }
         }
 
@@ -216,44 +240,11 @@ namespace HWJBardHealer.Content.Projectiles.Bard
             Color darkAura = new Color(10, 10, 10, 160) * fade * 0.8f;
             Color glowColor = new Color(250, 250, 250, 255) * fade * 0.8f;
 
-            Main.EntitySpriteDraw(
-                texture,
-                position,
-                sourceRectangle,
-                darkAura,
-                -Projectile.rotation * 0.4f,
-                origin,
-                Projectile.scale * 1.3f,
-                SpriteEffects.None,
-                0
-            );
-
-            Main.EntitySpriteDraw(
-                texture,
-                position,
-                sourceRectangle,
-                baseColor,
-                Projectile.rotation,
-                origin,
-                Projectile.scale,
-                SpriteEffects.None,
-                0
-            );
-
-            Main.EntitySpriteDraw(
-                texture,
-                position,
-                sourceRectangle,
-                glowColor,
-                Projectile.rotation,
-                origin,
-                Projectile.scale * 1.15f,
-                SpriteEffects.None,
-                0
-            );
+            Main.EntitySpriteDraw(texture, position, sourceRectangle, darkAura, -Projectile.rotation * 0.4f, origin, Projectile.scale * 1.3f, SpriteEffects.None, 0);
+            Main.EntitySpriteDraw(texture, position, sourceRectangle, baseColor, Projectile.rotation, origin, Projectile.scale, SpriteEffects.None, 0);
+            Main.EntitySpriteDraw(texture, position, sourceRectangle, glowColor, Projectile.rotation, origin, Projectile.scale * 1.15f, SpriteEffects.None, 0);
 
             return false;
         }
-
     }
 }

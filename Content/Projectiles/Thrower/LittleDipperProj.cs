@@ -28,7 +28,6 @@ namespace HWJBardHealer.Content.Projectiles.Thrower
         {
             Player player = Main.player[Projectile.owner];
 
-            // burst of dust at throw
             for (int d = 0; d < 12; d++)
             {
                 Vector2 vel = Main.rand.NextVector2Circular(2f, 2f);
@@ -43,14 +42,11 @@ namespace HWJBardHealer.Content.Projectiles.Thrower
 
         public override void AI()
         {
-            // light
             Lighting.AddLight(Projectile.Center, 0.3f, 0.4f, 0.1f);
 
-            // Rotation
             if (Projectile.velocity.LengthSquared() > 0.1f)
                 Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver2;
 
-            // Trail 
             if (Main.rand.NextBool(2))
             {
                 Dust d = Dust.NewDustDirect(Projectile.position, Projectile.width, Projectile.height, DustID.GoldFlame);
@@ -64,7 +60,6 @@ namespace HWJBardHealer.Content.Projectiles.Thrower
         {
             SpawnSparkles(target, damageDone);
 
-            // extra hit burst
             for (int i = 0; i < 20; i++)
             {
                 Dust dust = Dust.NewDustDirect(target.position, target.width, target.height, DustID.GoldFlame);
@@ -76,7 +71,6 @@ namespace HWJBardHealer.Content.Projectiles.Thrower
             SoundEngine.PlaySound(SoundID.Item27 with { Volume = 0.9f, PitchVariance = 0.2f }, target.Center);
         }
 
-        // burst VFX
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
             for (int i = 0; i < 16; i++)

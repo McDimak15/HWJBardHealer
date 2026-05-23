@@ -10,10 +10,8 @@ using Terraria.GameContent;
 using Terraria.ModLoader;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.DataStructures;
-using CalamityMod;
 using Terraria.ID;
 using HWJBardHealer.Content.Weapons.Healer;
-using CalamityMod.Buffs.DamageOverTime;
 
 namespace HWJBardHealer.Content.Projectiles.Healer
 {
@@ -30,8 +28,6 @@ namespace HWJBardHealer.Content.Projectiles.Healer
 
         public override void SafeOnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
-            target.AddBuff(ModContent.BuffType<CrushDepth>(), 180);
-
             Player owner = Main.player[Projectile.owner];
             owner.GetModPlayer<OtherworldlyPlayer>().OnScytheHit();
 

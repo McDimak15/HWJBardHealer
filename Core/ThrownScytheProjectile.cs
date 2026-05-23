@@ -20,6 +20,7 @@ namespace HWJBardHealer.Core
             {
                 if (entity.type == HWJbardhealer.Find<ModProjectile>("OtherworldlyScythePro").Type) return true;
                 if (entity.type == HWJbardhealer.Find<ModProjectile>("RodScythePro").Type) return true;
+                if (entity.type == HWJbardhealer.Find<ModProjectile>("SolsticeHarvesterPro").Type) return true;
             }
 
             foreach (var item in throwableScythes)

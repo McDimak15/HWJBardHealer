@@ -4,7 +4,7 @@ using System.Linq;
 using Terraria;
 using Terraria.ModLoader;
 
-namespace TestMod;
+namespace HWJBardHealer.Content.Projectiles.Healer;
 
 public class ForbiddenFruit : ModProjectile
 {

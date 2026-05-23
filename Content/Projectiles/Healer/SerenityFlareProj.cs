@@ -169,6 +169,8 @@ namespace HWJBardHealer.Content.Projectiles.Healer
             glowColor.A = 0;
             Vector2 origin = trailTex.Size() / 2f;
 
+            trailTex = ModContent.Request<Texture2D>(GlowTexture).Value;
+
             Main.EntitySpriteDraw(trailTex, Projectile.Center - Main.screenPosition, null, glowColor * fade, Main.GlobalTimeWrappedHourly * 6.2831855f, Utils.Size(trailTex) / 2f, Projectile.scale * 0.25f * fade, 0, 0);
             Main.EntitySpriteDraw(trailTex, Projectile.Center - Main.screenPosition, null, glowColor * fade, Main.GlobalTimeWrappedHourly * 3.1415927f, Utils.Size(trailTex) / 2f, Projectile.scale * 0.5f * fade, 0, 0);
             Main.EntitySpriteDraw(trailTex, Projectile.Center - Main.screenPosition, null, glowColor * fade, Main.GlobalTimeWrappedHourly * 1.5707964f, Utils.Size(trailTex) / 2f, Projectile.scale * 0.75f * fade, 0, 0);

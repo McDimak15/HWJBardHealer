@@ -25,20 +25,11 @@ namespace HWJBardHealer.Content.Accessories.Bard
             Item.accessory = true;
         }
 
-        public override void ModifyTooltips(List<TooltipLine> tooltips)
-        {
-
-
-            tooltips.RemoveAll(t => t.Name.StartsWith("BardBadge_"));
-            tooltips.Add(new TooltipLine(Mod, "BardBadge_1", "20% increased symphonic damage"));
-            tooltips.Add(new TooltipLine(Mod, "BardBadge_2", "5% increased symphonic critical strike chance"));
-        }
-
         public override void UpdateAccessory(Player player, bool hideVisual)
         {
             ThoriumPlayer thoriumPlayer = player.GetModPlayer<ThoriumPlayer>();
             player.GetDamage<BardDamage>() += 0.20f;
-            player.GetCritChance<BardDamage>() += 0.05f;
+            player.GetCritChance<BardDamage>() += 5f;
         }
     }
 
@@ -46,8 +37,7 @@ namespace HWJBardHealer.Content.Accessories.Bard
     {
         public override void ModifyItemLoot(Item item, ItemLoot itemLoot)
         {
-            if (ModLoader.TryGetMod("ContinentOfJourney", out Mod coJ) &&
-                ModLoader.TryGetMod("ThoriumMod", out Mod _))
+            if (ModLoader.TryGetMod("ContinentOfJourney", out Mod coJ))
             {
                 if (item.type == coJ.Find<ModItem>("WallofShadowTreasureBag")?.Type)
                 {

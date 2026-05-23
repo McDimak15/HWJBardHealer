@@ -7,11 +7,6 @@ using Terraria.ModLoader;
 using Terraria.DataStructures;
 using Terraria.Localization;
 using Terraria.GameContent.ItemDropRules;
-using CalamityMod;
-using CalamityMod.Items;
-using CalamityMod.Items.Materials;
-using CalamityMod.Rarities;
-using CalamityMod.Tiles.Furniture.CraftingStations;
 using ThoriumMod;
 using ThoriumMod.Items;
 using ThoriumMod.Items.HealerItems;
@@ -37,8 +32,8 @@ namespace HWJBardHealer.Content.Weapons.Healer
             scytheSoulCharge = 3;
             Item.width = 180;
             Item.height = 180;
-            Item.value = CalamityGlobalItem.RarityHotPinkBuyPrice;
-            Item.rare = ModContent.RarityType<HotPink>();
+            Item.sellPrice(0, 2, 50, 0);
+            Item.rare = ItemRarityID.LightRed;
             Item.shoot = ModContent.ProjectileType<OtherworldlyScythePro>();
             Item.autoReuse = true;
             ItemID.Sets.ItemsThatAllowRepeatedRightClick[Type] = true;
@@ -58,7 +53,6 @@ namespace HWJBardHealer.Content.Weapons.Healer
         }
     }
 
-    // bubble collection
     public class OtherworldlyPlayer : ModPlayer
     {
         private int hitCounter = 0;
@@ -77,7 +71,6 @@ namespace HWJBardHealer.Content.Weapons.Healer
 
         private void CollectBubble()
         {
-            // Dont spawn if bubbles are already active
             int activeBubbles = 0;
             for (int i = 0; i < Main.maxProjectiles; i++)
             {
@@ -86,11 +79,10 @@ namespace HWJBardHealer.Content.Weapons.Healer
             }
             if (activeBubbles > 0) return;
 
-            // Spawn 3 bubbles in random directions
             for (int i = 0; i < 3; i++)
             {
                 float angle = Main.rand.NextFloat(MathHelper.TwoPi);
-                float distance = Main.rand.Next(120, 160); // radius
+                float distance = Main.rand.Next(120, 160); 
                 Vector2 spawnPos = Player.Center + angle.ToRotationVector2() * distance;
 
                 Projectile.NewProjectile(
@@ -104,7 +96,6 @@ namespace HWJBardHealer.Content.Weapons.Healer
                 );
             }
 
-            // FX
             for (int i = 0; i < 15; i++)
             {
                 Dust.NewDust(Player.Center, 20, 20, DustID.Water,
@@ -115,18 +106,12 @@ namespace HWJBardHealer.Content.Weapons.Healer
             Terraria.Audio.SoundEngine.PlaySound(SoundID.Item85, Player.Center);
         }
 
-
-
-
-        // Damage reduction
         public override void ModifyHurt(ref Player.HurtModifiers modifiers)
         {
             if (Player.HasBuff(ModContent.BuffType<BubbleShield>()))
             {
-                modifiers.FinalDamage *= 0.9f;
+                modifiers.FinalDamage *= 0.8f;
                 Player.ClearBuff(ModContent.BuffType<BubbleShield>());
-
-                // FX
                 for (int i = 0; i < 20; i++)
                 {
                     Dust.NewDust(Player.Center, 10, 10, DustID.Water,

@@ -32,12 +32,11 @@ namespace HWJBardHealer.Content.Projectiles.Healer
             Projectile.tileCollide = true;
             Projectile.penetrate = 1;
             Projectile.timeLeft = 180;
+            Projectile.netUpdate = true;
         }
 
         public override void OnSpawn(IEntitySource source)
         {
-            SoundEngine.PlaySound(SoundID.Item72 with { Volume = 0.8f, PitchVariance = 0.2f }, Projectile.Center);
-
             for (int i = 0; i < 15; i++)
             {
                 int dust = Dust.NewDust(Projectile.Center, 0, 0, DustID.Electric,
@@ -48,10 +47,14 @@ namespace HWJBardHealer.Content.Projectiles.Healer
 
         public override void AI()
         {
+            if (Projectile.timeLeft == 180)
+            {
+                SoundEngine.PlaySound(SoundID.Item72 with { Volume = 0.8f, PitchVariance = 0.2f }, Projectile.Center);
+            }
+
             if (Projectile.velocity.Length() > 0.1f)
                 Projectile.rotation = Projectile.velocity.ToRotation();
 
-            // homing
             NPC closest = null;
             float closestDist = 300f;
             for (int i = 0; i < Main.maxNPCs; i++)
