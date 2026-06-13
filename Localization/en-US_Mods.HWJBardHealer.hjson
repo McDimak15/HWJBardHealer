@@ -116,7 +116,11 @@ Items: {
 
 	RogueBadge: {
 		DisplayName: Rogue Badge
-		Tooltip: ""
+		Tooltip: 
+			'''
+			20% increased thrower damage
+			5% increased thrower critical strike chance
+			'''
 	}
 
 	TheBibleOfTheThrowerVol4: {
@@ -291,6 +295,7 @@ Projectiles: {
 	WhaleEchoHeal.DisplayName: Whale Echo Heal
 	WhaleEchoHarm.DisplayName: Whale Echo Harm
 	EcholocationWhale.DisplayName: Echolocation Whale
+	FissionThrow_2.DisplayName: Fission Throw_2
 }
 
 ItemTooltips.ScytheThrow:

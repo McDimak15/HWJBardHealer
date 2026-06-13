@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using ThoriumMod; // for Bard damage base
 using Terraria.Audio;
 
 namespace HWJBardHealer.Content.Projectiles.Bard
@@ -30,7 +29,6 @@ namespace HWJBardHealer.Content.Projectiles.Bard
             Projectile.height = 32;
             Projectile.friendly = true;
             Projectile.penetrate = 1;
-            // The max lifetime is now just a safety limit, reduced to 180 ticks
             Projectile.timeLeft = 180;
             Projectile.tileCollide = true;
             Projectile.ignoreWater = true;
@@ -51,25 +49,27 @@ namespace HWJBardHealer.Content.Projectiles.Bard
             }
             Projectile.ai[1] = 0f;
 
-            // Fix from previous discussion: Nudge up on spawn if velocity is horizontal/downward to avoid ground clip.
             if (Projectile.velocity.Y >= 0f)
             {
                 Projectile.position.Y -= 16f;
             }
         }
 
+        public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
+        {
+            return base.Colliding(projHitbox, targetHitbox);
+        }
+
         public override void AI()
         {
             Projectile.ai[1] += 1f;
 
-            // --- FADE IN ---
             if (!fadingOut)
             {
                 fade += 0.05f;
                 if (fade > 1f) fade = 1f;
             }
 
-            // If the note is returning OR lifetime almost ended ? fade out
             if (Projectile.ai[1] > 10f && Projectile.timeLeft < 40)
             {
                 fadingOut = true;
@@ -82,26 +82,16 @@ namespace HWJBardHealer.Content.Projectiles.Bard
                     Projectile.Kill();
             }
 
-
             Player owner = Main.player[Projectile.owner];
-
-            // Set rotation to a static value (0)
             Projectile.rotation = 0f;
-
-            // The distance threshold for turning back (e.g., ~half a small screen width)
             const float maxOutwardDistance = 400f;
 
-            // Calculate current distance from the player's center
             Vector2 toOwnerCenter = owner.Center - Projectile.Center;
             float dist = toOwnerCenter.Length();
-
-            // Turnaround Logic: Check if it has reached the max distance OR if its initial speed was too low
             bool isReturning = Projectile.ai[1] > 10f && dist > maxOutwardDistance;
 
             if (!isReturning)
             {
-                // Outward flight: Velocity is constant (set by the item's Shoot method)
-                // If the projectile gets stuck (near zero velocity), force a return after a short delay
                 if (Projectile.velocity.LengthSquared() < 0.1f && Projectile.ai[1] > 10f)
                 {
                     isReturning = true;
@@ -110,9 +100,6 @@ namespace HWJBardHealer.Content.Projectiles.Bard
 
             if (isReturning)
             {
-                // Return phase
-
-                // Recalculate target to the player's held position
                 Vector2 targetPos = owner.MountedCenter + new Vector2(-10f, -6f);
                 Vector2 toTarget = (targetPos - Projectile.Center);
                 dist = toTarget.Length();
@@ -120,7 +107,6 @@ namespace HWJBardHealer.Content.Projectiles.Bard
                 if (dist > 2f)
                 {
                     toTarget.Normalize();
-                    // Max speed increased to 20f to ensure it returns faster
                     float speed = MathHelper.Lerp(10f, 20f, MathHelper.Clamp(dist / 400f, 0f, 1f));
                     Projectile.velocity = Vector2.Lerp(Projectile.velocity, toTarget * speed, 0.12f);
                 }
@@ -131,7 +117,6 @@ namespace HWJBardHealer.Content.Projectiles.Bard
                 }
             }
 
-            // --- Lighting and Dust ---
             Lighting.AddLight(Projectile.Center, 0.5f, 0.3f, 0.7f);
 
             if (Main.rand.NextBool(3))
@@ -154,7 +139,6 @@ namespace HWJBardHealer.Content.Projectiles.Bard
             Vector2 diff = end - start;
             float length = diff.Length();
 
-            // --- DRAW STRING  ---
             float rot = diff.ToRotation();
             float rotationForStick = rot - MathHelper.PiOver2;
             Vector2 origin = new Vector2(stringTex.Width * 0.5f, 0f);
@@ -172,7 +156,6 @@ namespace HWJBardHealer.Content.Projectiles.Bard
                 0
             );
 
-            // --- DRAW NOTE  ---
             int frames = Main.projFrames[Projectile.type];
             int frameHeight = noteTex.Height / frames;
             Rectangle src = new Rectangle(0, Projectile.frame * frameHeight, noteTex.Width, frameHeight);
@@ -193,11 +176,6 @@ namespace HWJBardHealer.Content.Projectiles.Bard
             );
 
             return false;
-        }
-
-        public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
-        {
-            return base.Colliding(projHitbox, targetHitbox);
         }
 
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)

@@ -6,8 +6,6 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using ThoriumMod;
-using ThoriumMod.Projectiles.Bard; 
-using ContinentOfJourney; 
 
 namespace HWJBardHealer.Content.Projectiles.Bard
 {

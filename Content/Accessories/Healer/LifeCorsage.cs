@@ -1,4 +1,3 @@
-using System;
 using Terraria;
 using Terraria.ModLoader;
 using ThoriumMod.Items;
@@ -11,7 +10,6 @@ using ContinentOfJourney.Items.Material;
 namespace HWJBardHealer.Content.Accessories.Healer
 {
     [AutoloadEquip(new EquipType[] { (EquipType)3 })]
-
     public class LifeCorsage : ThoriumItem
     {
         public override void SetDefaults()

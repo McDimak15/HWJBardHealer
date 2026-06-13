@@ -8,7 +8,6 @@ namespace HWJBardHealer.Content.Projectiles.Thrower
 {
     public class FissionThrow_2 : ModProjectile
     {
-        // Use the exact same texture as the original melee version
         public override string Texture => "ContinentOfJourney/Projectiles/Meelee/Fission_2";
 
         public override void SetDefaults()

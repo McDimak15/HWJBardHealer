@@ -38,10 +38,8 @@ namespace HWJBardHealer.Content.Weapons.Healer
         {
             attackCounter++;
 
-            // Normal scythe projectile
             Projectile.NewProjectile(source, position, velocity, type, damage, knockback, player.whoAmI);
 
-            // Every 3rd swing 
             if (attackCounter >= 3)
             {
                 attackCounter = 0;

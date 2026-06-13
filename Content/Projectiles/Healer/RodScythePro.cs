@@ -23,7 +23,7 @@ namespace HWJBardHealer.Content.Projectiles.Healer
         }
         public override void SafeOnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
-            // Explosion dust
+            // dust
             for (int i = 0; i < 25; i++)
             {
                 int dust = Dust.NewDust(target.position, target.width, target.height,
@@ -33,7 +33,7 @@ namespace HWJBardHealer.Content.Projectiles.Healer
 
             Terraria.Audio.SoundEngine.PlaySound(SoundID.Item14, target.Center);
 
-            // Small explosion
+            // explosion
             int explosionDamage = (int)(damageDone * 0.9f);
             Projectile.NewProjectile(
                 Projectile.GetSource_FromThis(),

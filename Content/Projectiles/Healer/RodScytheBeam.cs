@@ -38,7 +38,6 @@ namespace HWJBardHealer.Content.Projectiles.Healer
 
         public override void AI()
         {
-            // Find closest enemy
             NPC closest = null;
             float closestDist = 800f;
             for (int i = 0; i < Main.maxNPCs; i++)
@@ -55,21 +54,19 @@ namespace HWJBardHealer.Content.Projectiles.Healer
                 }
             }
 
-            // Kill instantly if no enemy found
             if (closest == null)
             {
                 Projectile.Kill();
                 return;
             }
 
-            // Spawn effect 
+            // spawn effect 
             if (!didSpawnEffect)
             {
                 didSpawnEffect = true;
 
                  SoundEngine.PlaySound(SoundID.Item72 with { Volume = 0.8f, PitchVariance = 0.3f }, Projectile.Center);
 
-                // Burst of dust
                 for (int i = 0; i < 25; i++)
                 {
                     Vector2 velocity = Main.rand.NextVector2Circular(3f, 3f);
@@ -77,7 +74,6 @@ namespace HWJBardHealer.Content.Projectiles.Healer
                     Main.dust[dust].noGravity = true;
                 }
 
-                // Sparkles
                 for (int i = 0; i < 10; i++)
                 {
                     Vector2 velocity = Main.rand.NextVector2Circular(2f, 2f);
@@ -86,22 +82,20 @@ namespace HWJBardHealer.Content.Projectiles.Healer
                 }
             }
 
-            // Homing
+            // homing
             float homingSpeed = 20f;
             Vector2 direction = closest.Center - Projectile.Center;
             direction.Normalize();
             direction *= homingSpeed;
 
             Projectile.velocity = (Projectile.velocity * 20f + direction) / 21f;
-
-            // Spin + light
             Projectile.rotation += 0.5f;
             Lighting.AddLight(Projectile.Center, 0.9f, 0.8f, 0.2f);
         }
 
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
-            // Explosion dust
+            // explosion dust
             for (int i = 0; i < 40; i++)
             {
                 Vector2 speed = Main.rand.NextVector2Circular(6f, 6f);

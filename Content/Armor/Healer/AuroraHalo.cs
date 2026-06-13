@@ -1,14 +1,13 @@
+using ContinentOfJourney.Items.Armor;
+using ContinentOfJourney.Items.Material;
+using ContinentOfJourney.Tiles;
+using HWJBardHealer.Content.Projectiles.Healer;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
-using Terraria.ModLoader;
 using Terraria.Localization;
+using Terraria.ModLoader;
 using ThoriumMod;
-using ThoriumMod.Items;
-using ContinentOfJourney.Tiles;
-using ContinentOfJourney.Items.Armor;
-using ContinentOfJourney.Items.Material;
-using HWJBardHealer.Content.Projectiles.Healer;
 
 namespace HWJBardHealer.Content.Armor.Healer
 {

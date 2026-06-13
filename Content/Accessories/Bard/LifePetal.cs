@@ -2,8 +2,6 @@ using Terraria;
 using Terraria.ModLoader;
 using ThoriumMod.Items;
 using ThoriumMod.Items.BardItems;
-using ThoriumMod.Utilities;
-using HWJBardHealer;
 using ContinentOfJourney.Tiles;
 using ContinentOfJourney.Items.Material;
 

@@ -1,11 +1,10 @@
+using ContinentOfJourney.Items;
+using HWJBardHealer.Content.Accessories.Bard;
 using Terraria;
+using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria.GameContent.Creative;
-using System.Collections.Generic;
-using Terraria.GameContent.ItemDropRules;
 using ThoriumMod;
-using ThoriumMod.Items.HealerItems;
 
 namespace HWJBardHealer.Content.Accessories.Healer
 {
@@ -13,7 +12,7 @@ namespace HWJBardHealer.Content.Accessories.Healer
     {
         public override void SetStaticDefaults()
         {
-            CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1;
+            ItemID.Sets.ShimmerTransformToItem[Type] = ModContent.ItemType<BardBadge>();
         }
 
         public override void SetDefaults()
@@ -27,8 +26,7 @@ namespace HWJBardHealer.Content.Accessories.Healer
 
         public override void UpdateAccessory(Player player, bool hideVisual)
         {
-            ThoriumPlayer thoriumPlayer = player.GetModPlayer<ThoriumPlayer>();
-            player.GetDamage<HealerDamage>() += 0.20f;
+            player.GetDamage<HealerDamage>() += 0.2f;
             player.GetCritChance<HealerDamage>() += 5f;
         }
     }
@@ -37,12 +35,9 @@ namespace HWJBardHealer.Content.Accessories.Healer
     {
         public override void ModifyItemLoot(Item item, ItemLoot itemLoot)
         {
-            if (ModLoader.TryGetMod("ContinentOfJourney", out Mod coJ))
+            if (item.type == ModContent.ItemType<WallofShadowTreasureBag>())
             {
-                if (item.type == coJ.Find<ModItem>("WallofShadowTreasureBag")?.Type)
-                {
-                    itemLoot.Add(ItemDropRule.Common(ModContent.ItemType<ClericBadge>(), 5));
-                }
+                itemLoot.Add(ItemDropRule.Common(ModContent.ItemType<ClericBadge>(), 5));
             }
         }
     }

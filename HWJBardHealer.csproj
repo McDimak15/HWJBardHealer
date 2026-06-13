@@ -7,10 +7,15 @@
 	<PropertyGroup>
 		
 	</PropertyGroup>
+	<ItemGroup>
+	  <Reference Include="ContinentOfJourney">
+	    <HintPath>..\..\ModReader\ContinentOfJourney\ContinentOfJourney.dll</HintPath>
+	  </Reference>
+	  <Reference Include="ThoriumMod">
+	    <HintPath>..\..\ModReader\ThoriumMod\ThoriumMod.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
 
 	<!-- References -->
-	<ItemGroup>
-		
-	</ItemGroup>
 
 </Project>
