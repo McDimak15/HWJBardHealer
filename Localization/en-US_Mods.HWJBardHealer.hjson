@@ -111,12 +111,17 @@ Items: {
 
 	DeluxeDewCollector: {
 		DisplayName: Deluxe Dew Collector
-		Tooltip: ""
+		Tooltip:
+			'''
+			Healing an ally grants them 2 life recovery and generates dew
+			Picking up dew increases your own life recovery by 4
+			Healing spells will heal an additional 6 life
+			'''
 	}
 
 	RogueBadge: {
 		DisplayName: Rogue Badge
-		Tooltip: 
+		Tooltip:
 			'''
 			20% increased thrower damage
 			5% increased thrower critical strike chance

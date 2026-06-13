@@ -1,7 +1,6 @@
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using System.Collections.Generic;
 using ThoriumMod.Items.HealerItems;
 using ThoriumMod.Utilities;
 using ContinentOfJourney.Items.Accessories;
@@ -12,10 +11,6 @@ namespace HWJBardHealer.Content.Accessories.Healer
 {
     public class DeluxeDewCollector : ModItem
     {
-        public override void SetStaticDefaults()
-        {
-        }
-
         public override void SetDefaults()
         {
             Item.width = 28;
@@ -23,10 +18,6 @@ namespace HWJBardHealer.Content.Accessories.Healer
             Item.accessory = true;
             Item.value = Item.buyPrice(gold: 10);
             Item.rare = ItemRarityID.Lime;
-        }
-
-        public override void ModifyTooltips(List<TooltipLine> tooltips)
-        {
         }
 
         public override void UpdateAccessory(Player player, bool hideVisual)
