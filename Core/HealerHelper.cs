@@ -41,32 +41,21 @@ namespace HWJBardHealer.Core
             return true;
         }
 
-        public static bool HealPlayer(Player healer, Player target, int healAmount = 1, int recoveryTime = 0, bool healEffects = true, Action<Player> extraEffects = null, Func<Player, bool> canHealTarget = null)
-        {
-            if (canHealTarget != null && !canHealTarget(target))
-                return false;
-
-            if (recoveryTime > 0)
-            {
-                target.GetThoriumPlayer().SetLifeRecoveryEffect(LifeRecoveryEffectType.Generic, (short)recoveryTime, request: true);
-                target.AddBuff(ModContent.BuffType<QuickRecovery>(), recoveryTime, true, false);
-            }
-
-            if (healEffects)
-                OnHealEffects(healer, target);
-
-            extraEffects?.Invoke(target);
-
-            healAmount += healer.GetThoriumPlayer().healBonus;
-
-            target.HealLife(healAmount, healer);
-            target.GetThoriumPlayer().mostRecentHeal = healAmount;
-            target.GetThoriumPlayer().mostRecentHealer = healer.whoAmI;
-
-            healer.ApplyInteractionNearbyNPCs();
-
-            return true;
-        }
+		public static bool HealPlayer(Player healer, Player target, int healAmount = 1, int recoveryTime = 0, bool healEffects = true, Action<Player> extraEffects = null, Func<Player, bool> canHealTarget = null) {
+			if(canHealTarget != null && !canHealTarget(target)) return false;
+			int type = ModContent.ProjectileType<HealNoEffects>();
+			if(healEffects) type = ModContent.ProjectileType<Heal>();
+			if(healer.whoAmI == Main.myPlayer) {
+				int p = Projectile.NewProjectile(healer.GetSource_OnHit(target), target.Center, Vector2.Zero, type, 0, 0f, healer.whoAmI, ModContent.GetInstance<BalanceConfig>().healing * healAmount, target.whoAmI);
+				NetMessage.SendData(27, -1, -1, null, p);
+			}
+			if(recoveryTime > 0) {
+				target.GetThoriumPlayer().SetLifeRecoveryEffect(LifeRecoveryEffectType.Generic, (short)recoveryTime, true);
+				target.AddBuff(ModContent.BuffType<QuickRecovery>(), recoveryTime, true, false);
+			}
+			if(extraEffects != null) extraEffects(target);
+			return true;
+		}
 
         public static void OnHealEffects(Player healer, Player target)
         {
