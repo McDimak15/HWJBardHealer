@@ -1,10 +1,12 @@
-using System;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
 using ThoriumMod;
+using ThoriumMod.Utilities;
 using ThoriumMod.Buffs.Healer;
 using ThoriumMod.Projectiles.Healer;
-using ThoriumMod.Utilities;
+using ThoriumMod.Items;
+using System;
 
 namespace HWJBardHealer.Core
 {
