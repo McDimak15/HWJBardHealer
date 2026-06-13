@@ -240,6 +240,23 @@ Items: {
 		Tooltip: ""
 		DisplayName: Echolocation
 	}
+
+	SeraphStatuette: {
+			DisplayName: Seraph Statuette
+		Tooltip:
+			'''
+			Empower certain radiant attacks with dark energy
+			Maximum life increased by 40
+			Maximum mana increased by 20
+			20% increased radiant damage
+			15% increased healing speed
+			12% increased radiant critical strike chance
+			10% increased radiant casting speed
+			Healing spells will heal 3 additional life 
+			Taking fatal damage unleashes your inner spirit and you respawn twice as quickly 
+			Your inner spirit will constantly release beams of healing energy towards your cursor
+			'''
+	}
 }
 
 ArmorSetBonuses.Healer_Aurora: Summon a Slime companion that heal your teammates.
