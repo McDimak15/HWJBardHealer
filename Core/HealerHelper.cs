@@ -85,26 +85,6 @@ namespace HWJBardHealer.Core
                     NetMessage.SendData(27, -1, -1, null, p);
                 }
 
-                if (thoriumHealer.accDewCollector.Active && healer.whoAmI == Main.myPlayer)
-                {
-                    int p2 = Projectile.NewProjectile(healer.GetSource_Accessory(thoriumHealer.accDewCollector.Item, null),
-                        target.Center.X, target.Center.Y,
-                        Utils.NextFloat(Main.rand, -1f, 1f), Utils.NextFloat(Main.rand, -3f, -1f),
-                        ModContent.ProjectileType<DewCollectorPro>(), 0, 0f, healer.whoAmI);
-                    NetMessage.SendData(27, -1, -1, null, p2);
-                }
-            }
-
-            // Life recovery effects
-            if (thoriumHealer.aloePlant)
-                thoriumTarget.SetLifeRecoveryEffect(LifeRecoveryEffectType.AloeLeaf, 600, request: true);
-
-            if (!selfHeal && thoriumHealer.equilibrium)
-            {
-                if (healer.statLife > target.statLife)
-                    thoriumTarget.SetLifeRecoveryEffect(LifeRecoveryEffectType.Equalizer, 300, request: true);
-                else
-                    thoriumHealer.SetLifeRecoveryEffect(LifeRecoveryEffectType.Equalizer, 300, request: true);
             }
         }
     }
