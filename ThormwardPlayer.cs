@@ -1,15 +1,16 @@
-using System;
-using System.Collections.Generic;
+using HWJBardHealer.Content.Projectiles.Bard;
 using Microsoft.Xna.Framework;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Reflection;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using ThoriumMod;
-using ThoriumMod.Projectiles.Scythe;
-using ThoriumMod.Projectiles.Bard;
 using ThoriumMod.Items.HealerItems;
-using HWJBardHealer.Content.Projectiles.Bard;
+using ThoriumMod.Projectiles.Bard;
 
 namespace HWJBardHealer
 {
@@ -26,16 +27,21 @@ namespace HWJBardHealer
 
         public bool hasPhantomGrip;
         public bool accDarkPoetry;
+        public bool accHarmonyHeadgear;
 
         public Vector2 phantomHandOffset;
         public float phantomTransition = 0f;
+
+        private static readonly FieldInfo ThoriumEmpField = typeof(ThoriumPlayer).GetField("Empowerments", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
+        private static readonly PropertyInfo ThoriumEmpProp = typeof(ThoriumPlayer).GetProperty("Empowerments", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
+
 
         public override void ResetEffects()
         {
             accLifePedal.Reset();
             accPopeCross.Reset();
             accDarkPoetry = false;
-
+            accHarmonyHeadgear = false;
             accPhantomGrip.Reset();
             hasPhantomGrip = false;
 
@@ -53,6 +59,7 @@ namespace HWJBardHealer
 
         public override void PostUpdateEquips()
         {
+            ThoriumPlayer thoriumPlayer = Player.GetModPlayer<ThoriumPlayer>();
             if (accLifePedal.Active)
             {
                 accLifePedalTimer++;
@@ -84,6 +91,17 @@ namespace HWJBardHealer
             else
             {
                 accLifePedalTimer = 0;
+            }
+            if (accHarmonyHeadgear)
+            {
+                int uniqueEmpowerments = GetUniqueEmpowermentCount(thoriumPlayer);
+                if (uniqueEmpowerments > 0)
+                {
+                    Player.moveSpeed += uniqueEmpowerments * 0.02f;
+                    Player.GetAttackSpeed(BardDamage.Instance) += uniqueEmpowerments * 0.02f;
+                    Player.GetDamage(BardDamage.Instance) += uniqueEmpowerments * 0.04f;
+                    thoriumPlayer.inspirationRegenBonus += uniqueEmpowerments * 0.02f;
+                }
             }
         }
 
@@ -218,13 +236,23 @@ namespace HWJBardHealer
                 }
             }
         }
-    }
 
-    public struct ItemWrapper
-    {
-        public Item Item { readonly get; private set; }
-        public bool Active => Item != null && !Item.IsAir;
-        public void Reset() => Item = null;
-        public void Set(Item item) => Item = item;
+        private int GetUniqueEmpowermentCount(ThoriumPlayer thoriumPlayer)
+        {
+            object rawEmps = ThoriumEmpField?.GetValue(thoriumPlayer) ?? ThoriumEmpProp?.GetValue(thoriumPlayer);
+            if (rawEmps is ThoriumMod.Empowerments.EmpowermentData emps)
+            {
+                return emps.ActiveEmpowerments.Count;
+            }
+            return 0;
+        }
+
+        public struct ItemWrapper
+        {
+            public Item Item { readonly get; private set; }
+            public bool Active => Item != null && !Item.IsAir;
+            public void Reset() => Item = null;
+            public void Set(Item item) => Item = item;
+        }
     }
 }

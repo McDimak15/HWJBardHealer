@@ -1,5 +1,5 @@
 displayName = Unofficial HWJ Bard, Healer & Thrower
-author = Kes, Kainsett
+author = Kes, n0t_UN_Owen
 version = 0.1
 
 modReferences = ContinentOfJourney,ThoriumMod, ThrowerUnification 

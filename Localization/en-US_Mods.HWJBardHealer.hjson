@@ -247,6 +247,19 @@ Items: {
 			Your inner spirit will constantly release beams of healing energy towards your cursor
 			'''
 	}
+
+	HarmonyHeadgear: {
+		DisplayName: Harmony Headgear
+		Tooltip: 
+			'''
+			Increases maximum inspiration by 5
+			Each unique empowerment you have increases your:
+			Symphonic damage by 4%
+			Symphonic playing speed by 2%
+			Inspiration regeneration rate by 2%
+			Movement speed by 2%
+			'''
+	}
 }
 
 ArmorSetBonuses.Healer_Aurora: Summon a Slime companion that heal your teammates.
