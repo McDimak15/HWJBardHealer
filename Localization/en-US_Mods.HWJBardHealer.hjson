@@ -250,7 +250,7 @@ Items: {
 
 	HarmonyHeadgear: {
 		DisplayName: Harmony Headgear
-		Tooltip: 
+		Tooltip:
 			'''
 			Increases maximum inspiration by 5
 			Each unique empowerment you have increases your:
@@ -258,6 +258,18 @@ Items: {
 			Symphonic playing speed by 2%
 			Inspiration regeneration rate by 2%
 			Movement speed by 2%
+			'''
+	}
+
+	ThrowingGuideVolume4: {
+		DisplayName: Guide to Expert Throwing : Volume IV
+		Tooltip:
+			'''
+			15% increased thrower damage
+			15% increased thrower velocity
+			30% of your thrower damage is duplicated
+			Enemies killed by your thrower damage release a spread of damaging coins
+			Enemies damaged by the coins are gouged and drop more money on death
 			'''
 	}
 }

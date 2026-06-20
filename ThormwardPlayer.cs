@@ -1,16 +1,16 @@
 using HWJBardHealer.Content.Projectiles.Bard;
 using Microsoft.Xna.Framework;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using Terraria;
 using Terraria.Audio;
+using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using ThoriumMod;
 using ThoriumMod.Items.HealerItems;
 using ThoriumMod.Projectiles.Bard;
+using ThoriumMod.Projectiles.Thrower;
 
 namespace HWJBardHealer
 {
@@ -28,6 +28,7 @@ namespace HWJBardHealer
         public bool hasPhantomGrip;
         public bool accDarkPoetry;
         public bool accHarmonyHeadgear;
+        public bool throwGuide4;
 
         public Vector2 phantomHandOffset;
         public float phantomTransition = 0f;
@@ -42,6 +43,8 @@ namespace HWJBardHealer
             accPopeCross.Reset();
             accDarkPoetry = false;
             accHarmonyHeadgear = false;
+            throwGuide4 = false;
+
             accPhantomGrip.Reset();
             hasPhantomGrip = false;
 
@@ -206,9 +209,23 @@ namespace HWJBardHealer
         }
 
 
-        public override void OnHitNPCWithProj(Projectile projectile, NPC target, NPC.HitInfo hit, int damageDone)
+        public override void OnHitNPCWithProj(Projectile proj, NPC target, NPC.HitInfo hit, int damageDone)
         {
-            BardProjectile bardProj = projectile.ModProjectile as BardProjectile;
+            IEntitySource source = proj.GetSource_OnHit(target, null);
+            if (throwGuide4)
+            {
+                int guideDamage = 0;
+                if (throwGuide4)
+                {
+                    guideDamage = (int)((double)proj.damage * 0.3);
+                }
+                if (guideDamage > 0)
+                {
+                    Projectile.NewProjectile(source, target.Center, Vector2.Zero, ModContent.ProjectileType<ThrowingGuideFollowup>(), guideDamage, 0f, proj.owner, (float)target.whoAmI, 0f, 0f);
+                }
+            }
+
+            BardProjectile bardProj = proj.ModProjectile as BardProjectile;
             if (bardProj == null)
                 return;
 
@@ -221,9 +238,9 @@ namespace HWJBardHealer
                     List<Projectile> petals = new List<Projectile>();
                     for (int i = 0; i < Main.maxProjectiles; i++)
                     {
-                        Projectile proj = Main.projectile[i];
-                        if (proj.active && proj.owner == Player.whoAmI && proj.type == petalProjType)
-                            petals.Add(proj);
+                        Projectile proj2 = Main.projectile[i];
+                        if (proj2.active && proj2.owner == Player.whoAmI && proj2.type == petalProjType)
+                            petals.Add(proj2);
                     }
 
                     if (petals.Count > 0)
