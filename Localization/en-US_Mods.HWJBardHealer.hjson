@@ -272,6 +272,16 @@ Items: {
 			Enemies damaged by the coins are gouged and drop more money on death
 			'''
 	}
+
+	TriNote: {
+		DisplayName: TriNote
+		Tooltip: Permanently increase inspiration regeneration rate by 10%
+	}
+
+	UmbrasEye: {
+		DisplayName: Umbra's Eye
+		Tooltip: Permanently increase maximum technique points by 1
+	}
 }
 
 ArmorSetBonuses.Healer_Aurora: Summon a Slime companion that heal your teammates.
